@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signal Desk</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="logo" aria-hidden="true">S</span>
+          <span>Signal Desk</span>
+        </div>
+        <nav class="navTabs" aria-label="Views">
+          <button class="navTab" id="chatTab" type="button">Chat</button>
+          <button class="navTab active" id="dashboardTab" type="button">Executive Dashboard</button>
+        </nav>
+        <div class="stats" id="stats">Loading corpus...</div>
+      </header>
+
+      <section class="view" id="chatView">
+        <section class="threadWrap" aria-label="Signal Desk chat">
+          <div class="thread" id="thread">
+            <div class="empty" id="emptyState">
+              <h1>What can I help you find?</h1>
+              <p>Ask across Slack, Jira, and Google Drive.</p>
+              <div class="exampleGrid" id="examples"></div>
+            </div>
+          </div>
+        </section>
+
+        <form class="composer" id="composer">
+          <input id="question" placeholder="Ask about teams, people, blockers, decisions, or changes..." />
+          <button type="submit" aria-label="Send">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+          </button>
+        </form>
+      </section>
+
+      <section class="view dashboardView activeView" id="dashboardView" aria-label="Executive dashboard">
+        <div class="dashboardShell">
+          <header class="dashboardHeader">
+            <div>
+              <p>Executive Dashboard</p>
+              <h1>What needs attention across the org</h1>
+            </div>
+            <button class="refreshButton" id="refreshDashboard" type="button">Refresh</button>
+          </header>
+          <div class="dashboardGrid" id="dashboardRoot"></div>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
