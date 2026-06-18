@@ -8,6 +8,7 @@ import {
   CardContent,
   Chip,
   Divider,
+  Drawer,
   FormControl,
   IconButton,
   LinearProgress,
@@ -40,10 +41,12 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Copy,
+  FileSearch,
   FileText,
   Gauge,
   GitBranch,
   GitPullRequest,
+  History,
   Layers3,
   ListChecks,
   MessageSquareText,
@@ -51,6 +54,7 @@ import {
   RefreshCw,
   ShieldAlert,
   Sparkles,
+  X,
 } from "lucide-react";
 import { programs, statuses, views } from "./data";
 
@@ -93,8 +97,13 @@ const toneColor = {
 };
 
 const panelSx = {
-  bgcolor: "rgba(17,18,23,0.86)",
-  borderColor: "rgba(255,255,255,0.08)",
+  bgcolor: "background.paper",
+  borderColor: "divider",
+};
+
+const insetSx = {
+  bgcolor: "#f8f7f1",
+  borderColor: "divider",
 };
 
 function App() {
@@ -102,6 +111,7 @@ function App() {
   const [activeView, setActiveView] = useState("overview");
   const [activeDraft, setActiveDraft] = useState("executive");
   const [riskFilter, setRiskFilter] = useState("all");
+  const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [toast, setToast] = useState("");
 
   const program = useMemo(
@@ -116,6 +126,10 @@ function App() {
 
   function showToast(message) {
     setToast(message);
+  }
+
+  function openEvidence(payload) {
+    setSelectedEvidence(payload);
   }
 
   async function copyDigest() {
@@ -136,8 +150,7 @@ function App() {
       sx={{
         minHeight: "100vh",
         bgcolor: "background.default",
-        background:
-          "radial-gradient(circle at 50% -20%, rgba(94,106,210,0.18), transparent 36%), #08090b",
+        background: "#f8f7f1",
       }}
     >
       <Sidebar activeView={activeView} program={program} setActiveView={setActiveView} />
@@ -162,7 +175,7 @@ function App() {
 
         <ContextStrip program={program} />
 
-        {activeView === "overview" && <Overview program={program} />}
+        {activeView === "overview" && <Overview openEvidence={openEvidence} program={program} />}
         {activeView === "digest" && (
           <Digest
             activeDraft={activeDraft}
@@ -173,10 +186,17 @@ function App() {
           />
         )}
         {activeView === "risks" && (
-          <Risks filteredRisks={filteredRisks} riskFilter={riskFilter} setRiskFilter={setRiskFilter} />
+          <Risks
+            filteredRisks={filteredRisks}
+            openEvidence={openEvidence}
+            riskFilter={riskFilter}
+            setRiskFilter={setRiskFilter}
+          />
         )}
-        {activeView === "evidence" && <Evidence program={program} />}
+        {activeView === "evidence" && <Evidence openEvidence={openEvidence} program={program} />}
       </Box>
+
+      <EvidenceDrawer evidence={selectedEvidence} onClose={() => setSelectedEvidence(null)} />
 
       <Snackbar
         open={Boolean(toast)}
@@ -184,7 +204,7 @@ function App() {
         onClose={() => setToast("")}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert severity="success" variant="filled" sx={{ borderRadius: 2 }}>
+        <Alert severity="success" variant="filled" sx={{ borderRadius: 1 }}>
           {toast}
         </Alert>
       </Snackbar>
@@ -205,9 +225,9 @@ function Sidebar({ activeView, program, setActiveView }) {
         flexDirection: "column",
         width: drawerWidth,
         p: 1.5,
-        bgcolor: "#0d0e11",
+        bgcolor: "#123c36",
         color: "common.white",
-        borderRight: "1px solid rgba(255,255,255,0.08)",
+        borderRight: "1px solid rgba(16,32,27,0.18)",
         zIndex: 10,
       }}
     >
@@ -217,9 +237,9 @@ function Sidebar({ activeView, program, setActiveView }) {
           sx={{
             width: 34,
             height: 34,
-            bgcolor: "rgba(94,106,210,0.22)",
+            bgcolor: "rgba(214,161,30,0.18)",
             color: "common.white",
-            border: "1px solid rgba(94,106,210,0.34)",
+            border: "1px solid rgba(214,161,30,0.34)",
           }}
         >
           <Activity size={18} />
@@ -245,14 +265,15 @@ function Sidebar({ activeView, program, setActiveView }) {
               sx={{
                 mb: 0.25,
                 minHeight: 34,
-                borderRadius: 1.5,
+                borderRadius: 0.75,
                 color: "rgba(255,255,255,0.62)",
                 "&.Mui-selected": {
-                  bgcolor: "rgba(255,255,255,0.08)",
+                  bgcolor: "rgba(255,255,255,0.1)",
                   color: "common.white",
+                  borderLeft: "3px solid #d6a11e",
                 },
                 "&.Mui-selected:hover, &:hover": {
-                  bgcolor: "rgba(255,255,255,0.075)",
+                  bgcolor: "rgba(255,255,255,0.1)",
                 },
               }}
             >
@@ -272,9 +293,9 @@ function Sidebar({ activeView, program, setActiveView }) {
         elevation={0}
         sx={{
           mt: "auto",
-          bgcolor: "rgba(255,255,255,0.045)",
+          bgcolor: "rgba(16,32,27,0.18)",
           color: "common.white",
-          border: "1px solid rgba(255,255,255,0.075)",
+          border: "1px solid rgba(255,255,255,0.14)",
         }}
       >
         <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
@@ -300,9 +321,9 @@ function Sidebar({ activeView, program, setActiveView }) {
                   value={signal.strength}
                   sx={{
                     height: 4,
-                    borderRadius: 99,
+                    borderRadius: 0,
                     bgcolor: "rgba(255,255,255,0.09)",
-                    "& .MuiLinearProgress-bar": { bgcolor: "#5e6ad2" },
+                    "& .MuiLinearProgress-bar": { bgcolor: "#d6a11e" },
                   }}
                 />
               </Box>
@@ -392,7 +413,7 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
           border: 1,
           borderColor: "divider",
           overflow: "hidden",
-          bgcolor: "rgba(17,18,23,0.86)",
+          bgcolor: "background.paper",
         }}
       >
         <Tabs
@@ -426,7 +447,7 @@ function ContextStrip({ program }) {
         gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", xl: "repeat(5, 1fr)" },
         overflow: "hidden",
         mb: 2.5,
-        bgcolor: "rgba(17,18,23,0.72)",
+        bgcolor: "background.paper",
         border: 1,
         borderColor: "divider",
       }}
@@ -461,13 +482,13 @@ function ContextStrip({ program }) {
           </Box>
           <Gauge size={18} />
         </Stack>
-        <LinearProgress variant="determinate" value={program.confidence} sx={{ height: 4, borderRadius: 99 }} />
+        <LinearProgress variant="determinate" value={program.confidence} sx={{ height: 4, borderRadius: 0 }} />
       </Box>
     </Paper>
   );
 }
 
-function Overview({ program }) {
+function Overview({ openEvidence, program }) {
   return (
     <Stack spacing={2.5}>
       <Box
@@ -481,6 +502,8 @@ function Overview({ program }) {
           <MetricCard key={metric.label} metric={metric} />
         ))}
       </Box>
+
+      <WeekChanges changes={program.weekChanges} openEvidence={openEvidence} />
 
       <Box
         sx={{
@@ -554,9 +577,122 @@ function Overview({ program }) {
         }}
       >
         <SourceCoverage program={program} />
-        <ConflictingSignals conflicts={program.conflicts} />
+        <ConflictingSignals conflicts={program.conflicts} openEvidence={openEvidence} />
       </Box>
     </Stack>
+  );
+}
+
+function WeekChanges({ changes, openEvidence }) {
+  return (
+    <Card elevation={0} sx={panelSx}>
+      <SectionHeader icon={History} eyebrow="Weekly delta" title="What changed since last week" />
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", lg: "repeat(3, minmax(0, 1fr))" },
+          gap: 0,
+        }}
+      >
+        {changes.map((change, index) => (
+          <Box
+            key={change.title}
+            sx={{
+              display: "grid",
+              gridTemplateRows: "32px 56px 66px 76px 58px 32px",
+              minHeight: 338,
+              p: 2,
+              borderRight: { lg: index < changes.length - 1 ? 1 : 0 },
+              borderBottom: { xs: index < changes.length - 1 ? 1 : 0, lg: 0 },
+              borderColor: "divider",
+            }}
+          >
+            <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
+              <Chip size="small" label={change.type} color={change.tone === "good" ? "success" : change.tone === "risk" ? "error" : "warning"} variant="outlined" />
+              <Chip size="small" label={change.confidence} variant="filled" sx={{ bgcolor: "action.hover" }} />
+            </Stack>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                alignSelf: "start",
+                display: "-webkit-box",
+                fontWeight: 880,
+                lineHeight: 1.25,
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
+              }}
+            >
+              {change.title}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                alignSelf: "start",
+                display: "-webkit-box",
+                lineHeight: 1.45,
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 3,
+              }}
+            >
+              {change.summary}
+            </Typography>
+            <Paper variant="outlined" sx={{ ...insetSx, alignSelf: "stretch", p: 1.2 }}>
+              <Stack direction="row" justifyContent="space-between" spacing={1}>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
+                    Last week
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 820, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {change.previous}
+                  </Typography>
+                </Box>
+                <Box sx={{ minWidth: 0, textAlign: "right" }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
+                    Now
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 820, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {change.current}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Paper>
+            <Stack
+              direction="row"
+              spacing={0.75}
+              useFlexGap
+              flexWrap="wrap"
+              sx={{ alignContent: "flex-start", overflow: "hidden" }}
+            >
+              {change.sources.map((source) => (
+                <Chip key={source} size="small" label={source} variant="filled" sx={{ bgcolor: "action.hover" }} />
+              ))}
+            </Stack>
+            <Button
+              fullWidth
+              size="small"
+              variant="outlined"
+              startIcon={<FileSearch size={15} />}
+              onClick={() =>
+                openEvidence({
+                  action: change.action,
+                  confidence: change.confidence,
+                  eyebrow: "Weekly delta",
+                  explanation: change.explanation,
+                  sources: change.sources,
+                  summary: change.summary,
+                  title: change.title,
+                })
+              }
+            >
+              Explain evidence
+            </Button>
+          </Box>
+        ))}
+      </Box>
+    </Card>
   );
 }
 
@@ -608,7 +744,7 @@ function SourceCoverage({ program }) {
                 variant={signal.state === "Mocked" ? "outlined" : "filled"}
               />
             </Stack>
-            <LinearProgress variant="determinate" value={signal.strength} sx={{ height: 5, borderRadius: 99 }} />
+            <LinearProgress variant="determinate" value={signal.strength} sx={{ height: 5, borderRadius: 0 }} />
           </Box>
         ))}
       </Stack>
@@ -616,7 +752,7 @@ function SourceCoverage({ program }) {
   );
 }
 
-function ConflictingSignals({ conflicts }) {
+function ConflictingSignals({ conflicts, openEvidence }) {
   return (
     <Card elevation={0} sx={panelSx}>
       <SectionHeader icon={AlertTriangle} eyebrow="Conflicting signals" title="Needs confirmation" />
@@ -638,7 +774,7 @@ function ConflictingSignals({ conflicts }) {
                 mb: 1.25,
               }}
             >
-              <Paper variant="outlined" sx={{ p: 1.25, bgcolor: "rgba(8,9,11,0.62)" }}>
+              <Paper variant="outlined" sx={{ ...insetSx, p: 1.25 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
                   System says
                 </Typography>
@@ -646,7 +782,7 @@ function ConflictingSignals({ conflicts }) {
                   {conflict.system}
                 </Typography>
               </Paper>
-              <Paper variant="outlined" sx={{ p: 1.25, bgcolor: "rgba(8,9,11,0.62)" }}>
+              <Paper variant="outlined" sx={{ ...insetSx, p: 1.25 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
                   Signals say
                 </Typography>
@@ -664,6 +800,25 @@ function ConflictingSignals({ conflicts }) {
                 <Chip key={source} size="small" label={source} variant="filled" sx={{ bgcolor: "action.hover" }} />
               ))}
             </Stack>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<FileSearch size={15} />}
+              onClick={() =>
+                openEvidence({
+                  action: conflict.question,
+                  confidence: `${conflict.priority} priority`,
+                  eyebrow: "Conflicting signals",
+                  explanation: [`System says: ${conflict.system}`, `Signals say: ${conflict.evidence}`],
+                  sources: conflict.sources,
+                  summary: conflict.question,
+                  title: conflict.title,
+                })
+              }
+              sx={{ mt: 1.5 }}
+            >
+              Explain evidence
+            </Button>
           </Box>
         ))}
       </Stack>
@@ -728,7 +883,7 @@ function InitiativeRow({ initiative }) {
             {drift}% vs plan
           </Typography>
         </Stack>
-        <LinearProgress variant="determinate" value={initiative.progress} sx={{ height: 5, borderRadius: 99 }} />
+        <LinearProgress variant="determinate" value={initiative.progress} sx={{ height: 5, borderRadius: 0 }} />
       </TableCell>
       <TableCell>
         <Chip
@@ -806,7 +961,7 @@ function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast })
             variant="outlined"
             sx={{
               p: 2.25,
-              bgcolor: "rgba(8,9,11,0.72)",
+              bgcolor: "#f8f7f1",
               minHeight: 276,
             }}
           >
@@ -843,7 +998,7 @@ function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast })
   );
 }
 
-function Risks({ filteredRisks, riskFilter, setRiskFilter }) {
+function Risks({ filteredRisks, openEvidence, riskFilter, setRiskFilter }) {
   return (
     <Stack spacing={2}>
       <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
@@ -894,7 +1049,7 @@ function Risks({ filteredRisks, riskFilter, setRiskFilter }) {
                 <RiskStat label="Impact" value={risk.impact} />
               </Box>
 
-              <Alert severity="success" icon={<CheckCircle2 size={16} />} sx={{ mb: 2, bgcolor: "rgba(56,161,105,0.1)", color: "text.primary" }}>
+              <Alert severity="success" icon={<CheckCircle2 size={16} />} sx={{ mb: 2, bgcolor: "rgba(31,122,74,0.1)", color: "text.primary", borderRadius: 1 }}>
                 {risk.action}
               </Alert>
 
@@ -903,6 +1058,30 @@ function Risks({ filteredRisks, riskFilter, setRiskFilter }) {
                   <Chip key={source} size="small" label={source} variant="filled" sx={{ bgcolor: "action.hover" }} />
                 ))}
               </Stack>
+              <Button
+                fullWidth
+                size="small"
+                variant="outlined"
+                startIcon={<FileSearch size={15} />}
+                onClick={() =>
+                  openEvidence({
+                    action: risk.action,
+                    confidence: `${risk.probability} probability`,
+                    eyebrow: "Risk explanation",
+                    explanation: [
+                      risk.body,
+                      `Impact area: ${risk.impact}.`,
+                      `Human owner to confirm: ${risk.owner}.`,
+                    ],
+                    sources: risk.sources,
+                    summary: risk.body,
+                    title: risk.title,
+                  })
+                }
+                sx={{ mt: 1.5 }}
+              >
+                Explain evidence
+              </Button>
             </CardContent>
           </Card>
         ))}
@@ -913,7 +1092,7 @@ function Risks({ filteredRisks, riskFilter, setRiskFilter }) {
 
 function RiskStat({ label, value }) {
   return (
-    <Paper variant="outlined" sx={{ p: 1.15, bgcolor: "rgba(8,9,11,0.62)", borderColor: "divider" }}>
+    <Paper variant="outlined" sx={{ ...insetSx, p: 1.15 }}>
       <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
         {label}
       </Typography>
@@ -924,7 +1103,7 @@ function RiskStat({ label, value }) {
   );
 }
 
-function Evidence({ program }) {
+function Evidence({ openEvidence, program }) {
   return (
     <Box
       sx={{
@@ -962,7 +1141,27 @@ function Evidence({ program }) {
                   {event.body}
                 </Typography>
               </Box>
-              <Chip size="small" label={`Confidence: ${event.confidence}`} variant="outlined" />
+              <Stack alignItems={{ xs: "flex-start", sm: "flex-end" }} spacing={1}>
+                <Chip size="small" label={`Confidence: ${event.confidence}`} variant="outlined" />
+                <Button
+                  size="small"
+                  variant="text"
+                  startIcon={<FileSearch size={14} />}
+                  onClick={() =>
+                    openEvidence({
+                      action: "Use this source as supporting evidence only; final status still needs human review.",
+                      confidence: event.confidence,
+                      eyebrow: event.source,
+                      explanation: [event.body],
+                      sources: [event.source],
+                      summary: event.body,
+                      title: event.title,
+                    })
+                  }
+                >
+                  Explain
+                </Button>
+              </Stack>
             </Box>
           ))}
         </Stack>
@@ -989,12 +1188,131 @@ function Evidence({ program }) {
                   variant={signal.state === "Mocked" ? "outlined" : "filled"}
                 />
               </Stack>
-              <LinearProgress variant="determinate" value={signal.strength} sx={{ height: 7, borderRadius: 99 }} />
+              <LinearProgress variant="determinate" value={signal.strength} sx={{ height: 7, borderRadius: 0 }} />
             </Box>
           ))}
         </Stack>
       </Card>
     </Box>
+  );
+}
+
+function EvidenceDrawer({ evidence, onClose }) {
+  const open = Boolean(evidence);
+
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          width: { xs: "100%", sm: 520 },
+          bgcolor: "background.paper",
+          backgroundImage: "none",
+          borderLeft: 1,
+          borderColor: "divider",
+        },
+      }}
+    >
+      {evidence && (
+        <Stack sx={{ minHeight: "100%" }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: "divider" }}
+          >
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              <Avatar
+                variant="rounded"
+                sx={{
+                  width: 32,
+                  height: 32,
+                  bgcolor: "rgba(214,161,30,0.16)",
+                  border: 1,
+                  borderColor: "rgba(214,161,30,0.38)",
+                }}
+              >
+                <FileSearch size={16} />
+              </Avatar>
+              <Box>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  {evidence.eyebrow}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ lineHeight: 1.15, fontWeight: 880 }}>
+                  Evidence explanation
+                </Typography>
+              </Box>
+            </Stack>
+            <Tooltip title="Close">
+              <IconButton onClick={onClose}>
+                <X size={17} />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+
+          <Stack spacing={2} sx={{ p: 2, overflow: "auto" }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 900, mb: 1 }}>
+                {evidence.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {evidence.summary}
+              </Typography>
+            </Box>
+
+            <Paper variant="outlined" sx={{ ...insetSx, p: 1.5 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Confidence
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 820 }}>
+                {evidence.confidence}
+              </Typography>
+            </Paper>
+
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Why this was flagged
+              </Typography>
+              <Stack spacing={1} sx={{ mt: 1 }}>
+                {evidence.explanation.map((item, index) => (
+                  <Paper
+                    key={`${item}-${index}`}
+                    variant="outlined"
+                    sx={{
+                      p: 1.35,
+                      bgcolor: "background.paper",
+                      borderLeft: 3,
+                      borderLeftColor: index === 0 ? "primary.main" : "divider",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      {item}
+                    </Typography>
+                  </Paper>
+                ))}
+              </Stack>
+            </Box>
+
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Source chain
+              </Typography>
+              <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
+                {evidence.sources.map((source) => (
+                  <Chip key={source} size="small" label={source} variant="filled" sx={{ bgcolor: "action.hover" }} />
+                ))}
+              </Stack>
+            </Box>
+
+            <Alert severity="info" icon={<CheckCircle2 size={16} />} sx={{ bgcolor: "rgba(7,89,133,0.1)", color: "text.primary", borderRadius: 1 }}>
+              {evidence.action}
+            </Alert>
+          </Stack>
+        </Stack>
+      )}
+    </Drawer>
   );
 }
 
@@ -1013,7 +1331,7 @@ function SectionHeader({ action, eyebrow, icon: Icon, title }) {
           sx={{
             width: 30,
             height: 30,
-            bgcolor: "rgba(255,255,255,0.055)",
+            bgcolor: "#f8f7f1",
             color: "text.secondary",
             border: 1,
             borderColor: "divider",

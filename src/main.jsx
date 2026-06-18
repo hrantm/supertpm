@@ -7,42 +7,42 @@ import "./styles.css";
 
 const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
-      main: "#5e6ad2",
-      dark: "#4b55b8",
+      main: "#123c36",
+      dark: "#10201b",
     },
     secondary: {
-      main: "#26a69a",
+      main: "#d6a11e",
     },
     success: {
-      main: "#38a169",
+      main: "#1f7a4a",
     },
     warning: {
-      main: "#d29922",
+      main: "#d6a11e",
     },
     error: {
-      main: "#e5484d",
+      main: "#b91c1c",
     },
     info: {
-      main: "#60a5fa",
+      main: "#075985",
     },
     background: {
-      default: "#08090b",
-      paper: "#111217",
+      default: "#f8f7f1",
+      paper: "#fffef8",
     },
     text: {
-      primary: "#f3f4f6",
-      secondary: "#9aa0aa",
+      primary: "#10201b",
+      secondary: "#53645f",
     },
-    divider: "rgba(255,255,255,0.08)",
+    divider: "rgba(18,60,54,0.14)",
   },
   shape: {
-    borderRadius: 10,
+    borderRadius: 4,
   },
   typography: {
     fontFamily:
-      '"Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+      'Aptos, "Segoe UI", system-ui, sans-serif',
     h3: {
       fontWeight: 800,
       letterSpacing: 0,
@@ -72,24 +72,24 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: "none",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 10,
+          border: "1px solid rgba(18,60,54,0.14)",
+          borderRadius: 4,
           boxShadow: "none",
-          backgroundColor: "#111217",
+          backgroundColor: "#fffef8",
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         rounded: {
-          borderRadius: 8,
+          borderRadius: 4,
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 3,
           minHeight: 32,
           boxShadow: "none",
           paddingLeft: 12,
@@ -100,7 +100,7 @@ const theme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 3,
           width: 32,
           height: 32,
         },
@@ -109,7 +109,7 @@ const theme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 3,
           fontWeight: 800,
           height: 24,
         },
@@ -118,10 +118,10 @@ const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderColor: "rgba(255,255,255,0.08)",
+          borderColor: "rgba(18,60,54,0.14)",
         },
         head: {
-          color: "#8b929e",
+          color: "#53645f",
           fontSize: 12,
           fontWeight: 900,
           letterSpacing: "0.05em",
@@ -132,7 +132,7 @@ const theme = createTheme({
     MuiSelect: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 3,
           minHeight: 32,
         },
       },
