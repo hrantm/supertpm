@@ -4,3 +4,4 @@ sourcevids/
 data/*.sqlite
 __pycache__/
 */__pycache__/
+.vercel
