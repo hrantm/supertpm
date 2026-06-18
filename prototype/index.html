@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Program Pulse Prototype</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="rail" aria-label="Workspace">
+        <div class="brand">
+          <div class="brand-mark">PP</div>
+          <div>
+            <p class="eyebrow">Xcelforce</p>
+            <h1>Program Pulse</h1>
+          </div>
+        </div>
+
+        <nav class="rail-nav" aria-label="Primary views">
+          <button class="nav-item active" data-view="overview" type="button">
+            <span class="nav-icon">01</span>
+            Overview
+          </button>
+          <button class="nav-item" data-view="digest" type="button">
+            <span class="nav-icon">02</span>
+            Monday Digest
+          </button>
+          <button class="nav-item" data-view="risks" type="button">
+            <span class="nav-icon">03</span>
+            Risk Review
+          </button>
+          <button class="nav-item" data-view="evidence" type="button">
+            <span class="nav-icon">04</span>
+            Evidence
+          </button>
+        </nav>
+
+        <div class="rail-status">
+          <p class="eyebrow">Prototype Mode</p>
+          <strong>Fixture data only</strong>
+          <span>No live Jira, Linear, GitHub, Slack, or Teams integrations.</span>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Engineering visibility layer</p>
+            <h2 id="view-title">Overview</h2>
+          </div>
+          <div class="top-actions">
+            <label class="select-label" for="program-select">Program</label>
+            <select id="program-select" class="program-select"></select>
+            <button class="ghost-button" id="refresh-button" type="button" title="Refresh mock data">Refresh</button>
+            <button class="solid-button" id="approve-button" type="button">Approve Digest</button>
+          </div>
+        </header>
+
+        <section class="context-strip" aria-label="Program context">
+          <div>
+            <span class="context-label">Owner</span>
+            <strong id="program-owner"></strong>
+          </div>
+          <div>
+            <span class="context-label">Cadence</span>
+            <strong id="program-cadence"></strong>
+          </div>
+          <div>
+            <span class="context-label">Last refresh</span>
+            <strong id="program-refresh"></strong>
+          </div>
+          <div>
+            <span class="context-label">Source confidence</span>
+            <strong id="program-confidence"></strong>
+          </div>
+        </section>
+
+        <section class="view active" id="overview-view" aria-labelledby="view-title">
+          <div class="metric-grid" id="metric-grid"></div>
+
+          <div class="overview-grid">
+            <section class="panel initiative-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Health by initiative</p>
+                  <h3>Current delivery picture</h3>
+                </div>
+                <div class="legend">
+                  <span><i class="dot green"></i>On track</span>
+                  <span><i class="dot amber"></i>Watch</span>
+                  <span><i class="dot red"></i>At risk</span>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Initiative</th>
+                      <th>Lead</th>
+                      <th>Progress</th>
+                      <th>Delta</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="initiative-table"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Manager readout</p>
+                  <h3>What changed this week</h3>
+                </div>
+              </div>
+              <div id="manager-readout" class="readout-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="digest-view" aria-labelledby="view-title">
+          <div class="digest-layout">
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Generated Monday 8:00 AM</p>
+                  <h3>Delivery digest</h3>
+                </div>
+                <button class="ghost-button compact" id="copy-digest-button" type="button">Copy</button>
+              </div>
+              <div id="digest-content" class="digest-content"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Suggested communications</p>
+                  <h3>Ready for review</h3>
+                </div>
+              </div>
+              <div class="tabs" role="tablist" aria-label="Communication audience">
+                <button class="tab active" data-audience="exec" type="button">Executive</button>
+                <button class="tab" data-audience="engineering" type="button">Engineering</button>
+                <button class="tab" data-audience="jira" type="button">Jira</button>
+              </div>
+              <article class="draft-box" id="draft-box"></article>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="risks-view" aria-labelledby="view-title">
+          <div class="risk-toolbar" aria-label="Risk filters">
+            <button class="filter-pill active" data-filter="all" type="button">All</button>
+            <button class="filter-pill" data-filter="critical" type="button">Critical</button>
+            <button class="filter-pill" data-filter="watch" type="button">Watch</button>
+            <button class="filter-pill" data-filter="blocked" type="button">Blocked</button>
+          </div>
+          <div class="risk-grid" id="risk-grid"></div>
+        </section>
+
+        <section class="view" id="evidence-view" aria-labelledby="view-title">
+          <div class="evidence-layout">
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Source-backed signals</p>
+                  <h3>Evidence timeline</h3>
+                </div>
+              </div>
+              <div class="timeline" id="evidence-timeline"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Traceability</p>
+                  <h3>Signal map</h3>
+                </div>
+              </div>
+              <div class="signal-map" id="signal-map"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

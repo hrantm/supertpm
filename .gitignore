@@ -1,4 +1,6 @@
 .env
+node_modules/
+sourcevids/
 data/*.sqlite
 __pycache__/
 */__pycache__/
