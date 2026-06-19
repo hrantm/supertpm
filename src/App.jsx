@@ -253,10 +253,10 @@ function Sidebar({ activeView, program, setActiveView }) {
           <Activity size={18} />
         </Avatar>
         <Box>
-          <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.58)", fontWeight: 760, lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.58)", fontWeight: 600, lineHeight: 1 }}>
             Xcelforce
           </Typography>
-          <Typography variant="subtitle2" sx={{ lineHeight: 1.05, fontWeight: 820 }}>
+          <Typography variant="subtitle2" sx={{ lineHeight: 1.05, fontWeight: 700 }}>
             Program Pulse
           </Typography>
         </Box>
@@ -290,7 +290,7 @@ function Sidebar({ activeView, program, setActiveView }) {
               </ListItemIcon>
               <ListItemText
                 primary={view.label}
-                primaryTypographyProps={{ fontWeight: 720, fontSize: 13 }}
+                primaryTypographyProps={{ fontWeight: 500, fontSize: 13 }}
               />
             </ListItemButton>
           );
@@ -308,7 +308,7 @@ function Sidebar({ activeView, program, setActiveView }) {
       >
         <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
-            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.58)", fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.58)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em" }}>
               Coverage
             </Typography>
             <RadioTower size={15} />
@@ -317,7 +317,7 @@ function Sidebar({ activeView, program, setActiveView }) {
             {program.signals.map((signal) => (
               <Box key={signal.source}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.65 }}>
-                  <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.82)", fontWeight: 740 }}>
+                  <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.82)", fontWeight: 500 }}>
                     {signal.source}
                   </Typography>
                   <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.62)", fontSize: 11 }}>
@@ -478,11 +478,11 @@ function ProgramMetaRail({ program }) {
               minWidth: 0,
             }}
           >
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
               {label}
             </Typography>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.35 }}>
-              <Typography variant="body2" sx={{ fontWeight: 720, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <Typography variant="body2" sx={{ fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {value}
               </Typography>
               {label === "Signal confidence" && (
@@ -523,7 +523,7 @@ function ProgramMetaRail({ program }) {
             sx={{
               bgcolor: "background.paper",
               color: "text.secondary",
-              fontWeight: 740,
+              fontWeight: 500,
               "& .MuiChip-icon": { color: "success.main" },
             }}
           />
@@ -596,7 +596,7 @@ function Overview({ openEvidence, program }) {
                         bgcolor: "#f0f3ef",
                         color: "text.primary",
                         fontSize: 12,
-                        fontWeight: 780,
+                        fontWeight: 600,
                       }}
                     >
                       {String(index + 1).padStart(2, "0")}
@@ -661,7 +661,7 @@ function WeekChanges({ changes, openEvidence }) {
               sx={{
                 alignSelf: "start",
                 display: "-webkit-box",
-                fontWeight: 820,
+                fontWeight: 700,
                 lineHeight: 1.25,
                 mt: 1.25,
                 overflow: "hidden",
@@ -689,18 +689,18 @@ function WeekChanges({ changes, openEvidence }) {
             <Paper variant="outlined" sx={{ ...insetSx, alignSelf: "stretch", p: 1.2, mt: 1.25 }}>
               <Stack direction="row" justifyContent="space-between" spacing={1}>
                 <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                     Last week
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 820, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {change.previous}
                   </Typography>
                 </Box>
                 <Box sx={{ minWidth: 0, textAlign: "right" }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                     Now
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 820, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {change.current}
                   </Typography>
                 </Box>
@@ -758,7 +758,7 @@ function ReviewQueue({ program }) {
           <Box key={item.title} sx={{ p: 2 }}>
             <Stack direction="row" spacing={1.25} alignItems="flex-start" justifyContent="space-between">
               <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 780 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                   {item.title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.45 }}>
@@ -783,10 +783,10 @@ function SourceCoverage({ program }) {
           <Box key={signal.source} sx={{ p: 2 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ mb: 1.1 }}>
               <Box>
-                <Typography variant="caption" color="primary" sx={{ fontWeight: 760 }}>
+                <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>
                   {signal.source}
                 </Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 780 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                   {signal.detail}
                 </Typography>
               </Box>
@@ -814,7 +814,7 @@ function ConflictingSignals({ conflicts, openEvidence }) {
           <Box key={conflict.title} sx={{ p: 2 }}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
               <Chip size="small" label={conflict.priority} color={conflict.priority === "High" ? "error" : "warning"} variant="outlined" />
-              <Typography variant="subtitle2" sx={{ fontWeight: 780 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                 {conflict.title}
               </Typography>
             </Stack>
@@ -828,7 +828,7 @@ function ConflictingSignals({ conflicts, openEvidence }) {
               }}
             >
               <Paper variant="outlined" sx={{ ...insetSx, p: 1.25 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                   System-of-record says
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 0.35 }}>
@@ -836,7 +836,7 @@ function ConflictingSignals({ conflicts, openEvidence }) {
                 </Typography>
               </Paper>
               <Paper variant="outlined" sx={{ ...insetSx, p: 1.25 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                   Delivery signals show
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 0.35 }}>
@@ -895,7 +895,7 @@ function MetricCard({ metric }) {
     <Card elevation={0} sx={{ ...panelSx, borderLeft: 3, borderLeftColor: toneColor[metric.tone] ?? "divider" }}>
       <CardContent sx={{ p: 1.75, "&:last-child": { pb: 1.75 } }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.35 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
             {metric.label}
           </Typography>
           <Chip
@@ -923,10 +923,10 @@ function InitiativeRow({ initiative }) {
   return (
     <TableRow hover sx={{ "&:last-child td": { borderBottom: 0 } }}>
       <TableCell sx={{ width: "34%" }}>
-        <Typography variant="caption" color="primary" sx={{ fontWeight: 780 }}>
+        <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>
           {initiative.key}
         </Typography>
-        <Typography variant="subtitle2" sx={{ fontWeight: 780 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
           {initiative.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -939,7 +939,7 @@ function InitiativeRow({ initiative }) {
           <Typography variant="caption" color="text.secondary">
             {initiative.progress}% evidence
           </Typography>
-          <Typography variant="caption" color={drift >= 0 ? "success.main" : "error.main"} sx={{ fontWeight: 760 }}>
+          <Typography variant="caption" color={drift >= 0 ? "success.main" : "error.main"} sx={{ fontWeight: 600 }}>
             {drift >= 0 ? "+" : ""}
             {drift}% vs expected
           </Typography>
@@ -993,7 +993,7 @@ function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast })
         <Stack divider={<Divider />} spacing={0}>
           {program.digest.map((section) => (
             <Box key={section.title} sx={{ p: 2.25 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 780, mb: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                 {section.title}
               </Typography>
               <Stack component="ul" spacing={1} sx={{ pl: 2.25, my: 0 }}>
@@ -1026,7 +1026,7 @@ function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast })
               minHeight: 276,
             }}
           >
-            <Typography variant="subtitle1" sx={{ fontWeight: 820, mb: 1.5 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>
               {draft.title}
             </Typography>
             <Stack spacing={1.25}>
@@ -1071,7 +1071,7 @@ function Risks({ filteredRisks, openEvidence, riskFilter, setRiskFilter }) {
             color={riskFilter === filter ? "primary" : "default"}
             variant={riskFilter === filter ? "filled" : "outlined"}
             onClick={() => setRiskFilter(filter)}
-            sx={{ textTransform: "capitalize", fontWeight: 800 }}
+            sx={{ textTransform: "capitalize", fontWeight: 600 }}
           />
         ))}
       </Stack>
@@ -1157,10 +1157,10 @@ function Risks({ filteredRisks, openEvidence, riskFilter, setRiskFilter }) {
 function RiskStat({ label, value }) {
   return (
     <Paper variant="outlined" sx={{ ...insetSx, p: 1.15 }}>
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760 }}>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
         {label}
       </Typography>
-      <Typography variant="body2" sx={{ fontWeight: 780 }}>
+      <Typography variant="body2" sx={{ fontWeight: 600 }}>
         {value}
       </Typography>
     </Paper>
@@ -1191,14 +1191,14 @@ function Evidence({ openEvidence, program }) {
                 alignItems: "start",
               }}
             >
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                 {event.time}
               </Typography>
               <Box>
-                <Typography variant="caption" color="primary" sx={{ fontWeight: 760 }}>
+                <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>
                   {event.source}
                 </Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 780 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                   {event.title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -1241,10 +1241,10 @@ function Evidence({ openEvidence, program }) {
             <Box key={signal.source} sx={{ p: 2 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ mb: 1.25 }}>
                 <Box>
-                  <Typography variant="caption" color="primary" sx={{ fontWeight: 760 }}>
+                  <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>
                     {signal.source}
                   </Typography>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 780 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                     {signal.detail}
                   </Typography>
                 </Box>
@@ -1310,10 +1310,10 @@ function EvidenceDrawer({ evidence, onClose }) {
                 <FileSearch size={16} />
               </Avatar>
               <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                   {evidence.eyebrow}
                 </Typography>
-                <Typography variant="subtitle1" sx={{ lineHeight: 1.15, fontWeight: 820 }}>
+                <Typography variant="subtitle1" sx={{ lineHeight: 1.15, fontWeight: 700 }}>
                   Evidence explanation
                 </Typography>
               </Box>
@@ -1327,10 +1327,10 @@ function EvidenceDrawer({ evidence, onClose }) {
 
           <Stack spacing={2} sx={{ p: 2, overflow: "auto" }}>
             <Box>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Claim
               </Typography>
-              <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 820, mt: 0.5, mb: 1 }}>
+              <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 700, mt: 0.5, mb: 1 }}>
                 {evidence.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -1351,10 +1351,10 @@ function EvidenceDrawer({ evidence, onClose }) {
               >
                 {contextItems.map((item) => (
                   <Paper key={item.label} variant="outlined" sx={{ ...insetSx, p: 1.35 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760 }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                       {item.label}
                     </Typography>
-                    <Typography variant="body2" sx={{ mt: 0.45, fontWeight: 820 }}>
+                    <Typography variant="body2" sx={{ mt: 0.45, fontWeight: 700 }}>
                       {item.value}
                     </Typography>
                   </Paper>
@@ -1363,7 +1363,7 @@ function EvidenceDrawer({ evidence, onClose }) {
             )}
 
             <Box>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Evidence chain
               </Typography>
               <Stack spacing={1} sx={{ mt: 1 }}>
@@ -1392,16 +1392,16 @@ function EvidenceDrawer({ evidence, onClose }) {
             </Box>
 
             <Paper variant="outlined" sx={{ ...insetSx, p: 1.5 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Confidence reason
               </Typography>
-              <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 820 }}>
+              <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 700 }}>
                 {evidence.confidenceReason ?? evidence.confidence}
               </Typography>
             </Paper>
 
             <Box>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Human follow-up
               </Typography>
               <Alert severity="info" icon={<CheckCircle2 size={16} />} sx={{ mt: 1, bgcolor: "rgba(7,89,133,0.1)", color: "text.primary", borderRadius: 1 }}>
@@ -1439,10 +1439,10 @@ function SectionHeader({ action, eyebrow, icon: Icon, title }) {
           <Icon size={15} />
         </Avatar>
         <Box>
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 760, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
             {eyebrow}
           </Typography>
-          <Typography variant="subtitle1" sx={{ lineHeight: 1.1, fontWeight: 820 }}>
+          <Typography variant="subtitle1" sx={{ lineHeight: 1.1, fontWeight: 700 }}>
             {title}
           </Typography>
         </Box>

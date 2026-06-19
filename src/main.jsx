@@ -2,6 +2,10 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { CssBaseline } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import "@fontsource/ibm-plex-sans/latin-400.css";
+import "@fontsource/ibm-plex-sans/latin-500.css";
+import "@fontsource/ibm-plex-sans/latin-600.css";
+import "@fontsource/ibm-plex-sans/latin-700.css";
 import App from "./App.jsx";
 import "./styles.css";
 
@@ -43,28 +47,28 @@ const theme = createTheme({
   },
   typography: {
     fontFamily:
-      'Aptos, "Avenir Next", "Helvetica Neue", "Segoe UI", system-ui, sans-serif',
+      '"IBM Plex Sans", "Avenir Next", "Helvetica Neue", "Segoe UI", system-ui, sans-serif',
     h3: {
-      fontWeight: 800,
+      fontWeight: 700,
       letterSpacing: 0,
       lineHeight: 1.04,
     },
     h4: {
-      fontWeight: 800,
+      fontWeight: 700,
       letterSpacing: 0,
     },
     h6: {
-      fontWeight: 800,
-    },
-    subtitle1: {
       fontWeight: 700,
     },
+    subtitle1: {
+      fontWeight: 600,
+    },
     button: {
-      fontWeight: 800,
+      fontWeight: 600,
       textTransform: "none",
     },
     overline: {
-      fontWeight: 760,
+      fontWeight: 600,
       letterSpacing: "0.06em",
     },
   },
@@ -115,7 +119,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 3,
-          fontWeight: 760,
+          fontWeight: 600,
           height: 24,
         },
       },
@@ -128,7 +132,7 @@ const theme = createTheme({
         head: {
           color: "#5f6b66",
           fontSize: 12,
-          fontWeight: 780,
+          fontWeight: 600,
           letterSpacing: "0.04em",
           textTransform: "uppercase",
         },
