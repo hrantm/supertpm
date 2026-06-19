@@ -41,6 +41,7 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Copy,
+  Eye,
   FileSearch,
   FileText,
   Gauge,
@@ -85,7 +86,7 @@ const statusColor = {
 
 const sourceStateColor = {
   "Read only": "success",
-  Mocked: "warning",
+  Simulated: "warning",
   Optional: "info",
   "Human reviewed": "primary",
 };
@@ -100,6 +101,13 @@ const panelSx = {
   bgcolor: "background.paper",
   borderColor: "divider",
 };
+
+const guardrails = [
+  "Prototype read-only inputs",
+  "Draft output only",
+  "Human approval required",
+  "No autonomous writeback",
+];
 
 const insetSx = {
   bgcolor: "#f8f7f1",
@@ -172,6 +180,8 @@ function App() {
           setProgramId={setProgramId}
           showToast={showToast}
         />
+
+        <GuardrailStrip />
 
         <ContextStrip program={program} />
 
@@ -351,13 +361,13 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
         <Box sx={{ maxWidth: 820 }}>
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 1 }}>
             <Chip size="small" label="Prototype" color="primary" variant="outlined" />
-            <Chip size="small" label="Hardcoded data" variant="outlined" />
+            <Chip size="small" label="Simulated snapshot" variant="outlined" />
           </Stack>
           <Typography variant="h3" sx={{ mb: 0.75, letterSpacing: 0, fontSize: { xs: 32, md: 40 } }}>
             {program.name}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-            Read-only visibility across Jira, GitHub, Slack, Notion, meeting notes, and release signals. {program.summary}
+            Prototype of read-only visibility across Jira, GitHub, Slack, Notion, meeting notes, and release signals. {program.summary}
           </Typography>
         </Box>
 
@@ -379,9 +389,9 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
               ))}
             </Select>
           </FormControl>
-          <Tooltip title="Refresh mock data">
+          <Tooltip title="Refresh demo snapshot">
             <IconButton
-              onClick={() => showToast("Mock source snapshot refreshed.")}
+              onClick={() => showToast("Demo snapshot refreshed.")}
               sx={{ width: 32, height: 32, border: 1, borderColor: "divider" }}
             >
               <RefreshCw size={15} />
@@ -391,7 +401,7 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
             variant="contained"
             size="small"
             startIcon={<CheckCircle2 size={14} />}
-            onClick={() => showToast("Brief prepared for human review.")}
+            onClick={() => showToast("Weekly brief prepared for human review.")}
             sx={{
               minHeight: 32,
               height: 32,
@@ -401,7 +411,7 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
               "& .MuiButton-startIcon": { mr: 0.65 },
             }}
           >
-            Prepare Brief
+            Prepare weekly brief
           </Button>
         </Stack>
       </Stack>
@@ -428,6 +438,44 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
         </Tabs>
       </Paper>
     </Stack>
+  );
+}
+
+function GuardrailStrip() {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" },
+        mb: 1.5,
+        overflow: "hidden",
+        border: 1,
+        borderColor: "divider",
+        bgcolor: "background.paper",
+      }}
+    >
+      {guardrails.map((item, index) => (
+        <Stack
+          key={item}
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          sx={{
+            minHeight: 38,
+            px: 1.5,
+            borderRight: { lg: index < guardrails.length - 1 ? 1 : 0 },
+            borderBottom: { xs: index < guardrails.length - 1 ? 1 : 0, sm: index < 2 ? 1 : 0, lg: 0 },
+            borderColor: "divider",
+          }}
+        >
+          <Eye size={15} color="#1f7a4a" />
+          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+            {item}
+          </Typography>
+        </Stack>
+      ))}
+    </Paper>
   );
 }
 
@@ -474,7 +522,7 @@ function ContextStrip({ program }) {
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.8 }}>
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Source confidence
+              Signal confidence
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 760, mt: 0.45 }}>
               {program.confidence}%
@@ -491,6 +539,8 @@ function ContextStrip({ program }) {
 function Overview({ openEvidence, program }) {
   return (
     <Stack spacing={2.5}>
+      <WeekChanges changes={program.weekChanges} openEvidence={openEvidence} />
+
       <Box
         sx={{
           display: "grid",
@@ -502,8 +552,6 @@ function Overview({ openEvidence, program }) {
           <MetricCard key={metric.label} metric={metric} />
         ))}
       </Box>
-
-      <WeekChanges changes={program.weekChanges} openEvidence={openEvidence} />
 
       <Box
         sx={{
@@ -679,8 +727,13 @@ function WeekChanges({ changes, openEvidence }) {
                 openEvidence({
                   action: change.action,
                   confidence: change.confidence,
+                  confidenceReason: `${change.confidence}. ${change.explanation[0]}`,
+                  current: change.current,
+                  currentLabel: "Now",
                   eyebrow: "Weekly delta",
                   explanation: change.explanation,
+                  previous: change.previous,
+                  previousLabel: "Last week",
                   sources: change.sources,
                   summary: change.summary,
                   title: change.title,
@@ -741,7 +794,7 @@ function SourceCoverage({ program }) {
                 size="small"
                 label={signal.state}
                 color={sourceStateColor[signal.state] ?? "default"}
-                variant={signal.state === "Mocked" ? "outlined" : "filled"}
+                variant={signal.state === "Simulated" ? "outlined" : "filled"}
               />
             </Stack>
             <LinearProgress variant="determinate" value={signal.strength} sx={{ height: 5, borderRadius: 0 }} />
@@ -776,7 +829,7 @@ function ConflictingSignals({ conflicts, openEvidence }) {
             >
               <Paper variant="outlined" sx={{ ...insetSx, p: 1.25 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
-                  System says
+                  System-of-record says
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 0.35 }}>
                   {conflict.system}
@@ -784,7 +837,7 @@ function ConflictingSignals({ conflicts, openEvidence }) {
               </Paper>
               <Paper variant="outlined" sx={{ ...insetSx, p: 1.25 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
-                  Signals say
+                  Delivery signals show
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 0.35 }}>
                   {conflict.evidence}
@@ -808,8 +861,16 @@ function ConflictingSignals({ conflicts, openEvidence }) {
                 openEvidence({
                   action: conflict.question,
                   confidence: `${conflict.priority} priority`,
+                  confidenceReason: `${conflict.priority} priority because the system-of-record status and delivery evidence disagree.`,
+                  current: conflict.evidence,
+                  currentLabel: "Delivery signals show",
                   eyebrow: "Conflicting signals",
-                  explanation: [`System says: ${conflict.system}`, `Signals say: ${conflict.evidence}`],
+                  explanation: [
+                    `System-of-record says: ${conflict.system}`,
+                    `Delivery signals show: ${conflict.evidence}`,
+                  ],
+                  previous: conflict.system,
+                  previousLabel: "System-of-record says",
                   sources: conflict.sources,
                   summary: conflict.question,
                   title: conflict.title,
@@ -948,7 +1009,7 @@ function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast })
       </Card>
 
       <Card elevation={0} sx={panelSx}>
-        <SectionHeader icon={MessageSquareText} eyebrow="Suggested communication" title="Human-reviewed drafts" />
+        <SectionHeader icon={MessageSquareText} eyebrow="Suggested communication" title="Drafts for human review" />
         <Box sx={{ px: 2, pt: 1 }}>
           <Tabs value={activeDraft} onChange={(_, value) => setActiveDraft(value)} variant="fullWidth">
             {draftTabs.map((tab) => (
@@ -982,15 +1043,15 @@ function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast })
             variant="contained"
             size="small"
             startIcon={<CheckCircle2 size={15} />}
-            onClick={() => showToast("Readout approved for sharing.")}
+            onClick={() => showToast("Brief approved for sharing.")}
           >
-            Approve readout
+            Approve for sharing
           </Button>
           <Button variant="outlined" size="small" onClick={() => showToast("Draft opened for editing.")}>
             Edit draft
           </Button>
-          <Button color="inherit" size="small" onClick={() => showToast("Signal dismissed from this brief.")}>
-            Dismiss signal
+          <Button color="inherit" size="small" onClick={() => showToast("Signal excluded from this brief.")}>
+            Exclude from brief
           </Button>
         </Stack>
       </Card>
@@ -1067,6 +1128,9 @@ function Risks({ filteredRisks, openEvidence, riskFilter, setRiskFilter }) {
                   openEvidence({
                     action: risk.action,
                     confidence: `${risk.probability} probability`,
+                    confidenceReason: `${risk.probability} probability based on ${risk.sources.length} linked signals and ${risk.impact.toLowerCase()} impact.`,
+                    current: risk.body,
+                    currentLabel: "Risk signal",
                     eyebrow: "Risk explanation",
                     explanation: [
                       risk.body,
@@ -1114,7 +1178,7 @@ function Evidence({ openEvidence, program }) {
       }}
     >
       <Card elevation={0} sx={panelSx}>
-        <SectionHeader icon={GitPullRequest} eyebrow="Source-backed signals" title="What the system saw" />
+        <SectionHeader icon={GitPullRequest} eyebrow="Demo source chain" title="Example delivery signals" />
         <Stack divider={<Divider />}>
           {program.evidence.map((event) => (
             <Box
@@ -1149,8 +1213,11 @@ function Evidence({ openEvidence, program }) {
                   startIcon={<FileSearch size={14} />}
                   onClick={() =>
                     openEvidence({
-                      action: "Use this source as supporting evidence only; final status still needs human review.",
+                      action: "Use this as supporting evidence only; final status still needs human review.",
                       confidence: event.confidence,
+                      confidenceReason: `${event.confidence} confidence from a ${event.source} signal in the simulated snapshot.`,
+                      current: event.body,
+                      currentLabel: event.source,
                       eyebrow: event.source,
                       explanation: [event.body],
                       sources: [event.source],
@@ -1185,7 +1252,7 @@ function Evidence({ openEvidence, program }) {
                   size="small"
                   label={signal.state}
                   color={sourceStateColor[signal.state] ?? "default"}
-                  variant={signal.state === "Mocked" ? "outlined" : "filled"}
+                  variant={signal.state === "Simulated" ? "outlined" : "filled"}
                 />
               </Stack>
               <LinearProgress variant="determinate" value={signal.strength} sx={{ height: 7, borderRadius: 0 }} />
@@ -1199,6 +1266,12 @@ function Evidence({ openEvidence, program }) {
 
 function EvidenceDrawer({ evidence, onClose }) {
   const open = Boolean(evidence);
+  const contextItems = evidence
+    ? [
+        { label: evidence.previousLabel ?? "Last week", value: evidence.previous },
+        { label: evidence.currentLabel ?? "Now", value: evidence.current },
+      ].filter((item) => item.value)
+    : [];
 
   return (
     <Drawer
@@ -1254,7 +1327,10 @@ function EvidenceDrawer({ evidence, onClose }) {
 
           <Stack spacing={2} sx={{ p: 2, overflow: "auto" }}>
             <Box>
-              <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 900, mb: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Claim
+              </Typography>
+              <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 900, mt: 0.5, mb: 1 }}>
                 {evidence.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -1262,18 +1338,33 @@ function EvidenceDrawer({ evidence, onClose }) {
               </Typography>
             </Box>
 
-            <Paper variant="outlined" sx={{ ...insetSx, p: 1.5 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Confidence
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 820 }}>
-                {evidence.confidence}
-              </Typography>
-            </Paper>
+            {contextItems.length > 0 && (
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: contextItems.length > 1 ? "repeat(2, minmax(0, 1fr))" : "1fr",
+                  },
+                  gap: 1,
+                }}
+              >
+                {contextItems.map((item) => (
+                  <Paper key={item.label} variant="outlined" sx={{ ...insetSx, p: 1.35 }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900 }}>
+                      {item.label}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.45, fontWeight: 820 }}>
+                      {item.value}
+                    </Typography>
+                  </Paper>
+                ))}
+              </Box>
+            )}
 
             <Box>
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Why this was flagged
+                Evidence chain
               </Typography>
               <Stack spacing={1} sx={{ mt: 1 }}>
                 {evidence.explanation.map((item, index) => (
@@ -1293,12 +1384,6 @@ function EvidenceDrawer({ evidence, onClose }) {
                   </Paper>
                 ))}
               </Stack>
-            </Box>
-
-            <Box>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Source chain
-              </Typography>
               <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
                 {evidence.sources.map((source) => (
                   <Chip key={source} size="small" label={source} variant="filled" sx={{ bgcolor: "action.hover" }} />
@@ -1306,9 +1391,23 @@ function EvidenceDrawer({ evidence, onClose }) {
               </Stack>
             </Box>
 
-            <Alert severity="info" icon={<CheckCircle2 size={16} />} sx={{ bgcolor: "rgba(7,89,133,0.1)", color: "text.primary", borderRadius: 1 }}>
-              {evidence.action}
-            </Alert>
+            <Paper variant="outlined" sx={{ ...insetSx, p: 1.5 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Confidence reason
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 820 }}>
+                {evidence.confidenceReason ?? evidence.confidence}
+              </Typography>
+            </Paper>
+
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Human follow-up
+              </Typography>
+              <Alert severity="info" icon={<CheckCircle2 size={16} />} sx={{ mt: 1, bgcolor: "rgba(7,89,133,0.1)", color: "text.primary", borderRadius: 1 }}>
+                {evidence.action}
+              </Alert>
+            </Box>
           </Stack>
         </Stack>
       )}

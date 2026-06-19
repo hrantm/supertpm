@@ -34,7 +34,7 @@ export const programs = [
         note: "Risk is concentrated in two stories.",
       },
       {
-        label: "Source-backed signals",
+        label: "Reviewed signals",
         value: "46",
         delta: "+17",
         tone: "neutral",
@@ -320,11 +320,11 @@ export const programs = [
     ],
     signals: [
       { source: "Jira", detail: "Initiatives and committed scope", state: "Read only", strength: 94 },
-      { source: "Git", detail: "PRs, diffs, owners, changed files", state: "Mocked", strength: 88 },
-      { source: "CI", detail: "Test and validation evidence", state: "Mocked", strength: 71 },
+      { source: "Git", detail: "PRs, diffs, owners, changed files", state: "Simulated", strength: 88 },
+      { source: "CI", detail: "Test and validation evidence", state: "Simulated", strength: 71 },
       { source: "Slack", detail: "Risk comments and owner asks", state: "Optional", strength: 46 },
-      { source: "Meeting Notes", detail: "Lead syncs, standups, and review decisions", state: "Mocked", strength: 68 },
-      { source: "Notion", detail: "Runbooks, specs, and release checklists", state: "Mocked", strength: 63 },
+      { source: "Meeting Notes", detail: "Lead syncs, standups, and review decisions", state: "Simulated", strength: 68 },
+      { source: "Notion", detail: "Runbooks, specs, and release checklists", state: "Simulated", strength: 63 },
       { source: "Output", detail: "Brief, system note, exec summary", state: "Human reviewed", strength: 100 },
     ],
   },
@@ -362,7 +362,7 @@ export const programs = [
         note: "Risk improved after mobile SDK merge.",
       },
       {
-        label: "Source-backed signals",
+        label: "Reviewed signals",
         value: "33",
         delta: "+11",
         tone: "neutral",
@@ -601,21 +601,21 @@ export const programs = [
     ],
     signals: [
       { source: "Jira", detail: "Release checklist and scope", state: "Read only", strength: 89 },
-      { source: "Git", detail: "SDK branches and PRs", state: "Mocked", strength: 77 },
-      { source: "CI", detail: "Integration tests", state: "Mocked", strength: 81 },
+      { source: "Git", detail: "SDK branches and PRs", state: "Simulated", strength: 77 },
+      { source: "CI", detail: "Integration tests", state: "Simulated", strength: 81 },
       { source: "Slack", detail: "Reviewer asks and launch-channel risk comments", state: "Optional", strength: 38 },
-      { source: "Meeting Notes", detail: "Readiness prep and reviewer risks", state: "Mocked", strength: 62 },
-      { source: "Notion", detail: "Release checklist and localization notes", state: "Mocked", strength: 66 },
+      { source: "Meeting Notes", detail: "Readiness prep and reviewer risks", state: "Simulated", strength: 62 },
+      { source: "Notion", detail: "Release checklist and localization notes", state: "Simulated", strength: 66 },
       { source: "Output", detail: "Thursday readiness summary", state: "Human reviewed", strength: 100 },
     ],
   },
 ];
 
 export const views = [
-  { id: "overview", label: "Program Pulse" },
+  { id: "overview", label: "Overview" },
   { id: "digest", label: "Weekly Brief" },
   { id: "risks", label: "Attention Needed" },
-  { id: "evidence", label: "Sources" },
+  { id: "evidence", label: "Evidence" },
 ];
 
 export const statuses = {
