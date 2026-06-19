@@ -10,16 +10,17 @@ const theme = createTheme({
     mode: "light",
     primary: {
       main: "#123c36",
-      dark: "#10201b",
+      dark: "#0f2f2a",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: "#d6a11e",
+      main: "#b7791f",
     },
     success: {
       main: "#1f7a4a",
     },
     warning: {
-      main: "#d6a11e",
+      main: "#b7791f",
     },
     error: {
       main: "#b91c1c",
@@ -28,21 +29,21 @@ const theme = createTheme({
       main: "#075985",
     },
     background: {
-      default: "#f8f7f1",
-      paper: "#fffef8",
+      default: "#f5f6f3",
+      paper: "#ffffff",
     },
     text: {
-      primary: "#10201b",
-      secondary: "#53645f",
+      primary: "#111816",
+      secondary: "#5f6b66",
     },
-    divider: "rgba(18,60,54,0.14)",
+    divider: "rgba(17,24,22,0.12)",
   },
   shape: {
     borderRadius: 4,
   },
   typography: {
     fontFamily:
-      'Aptos, "Segoe UI", system-ui, sans-serif',
+      'Aptos, "Avenir Next", "Helvetica Neue", "Segoe UI", system-ui, sans-serif',
     h3: {
       fontWeight: 800,
       letterSpacing: 0,
@@ -63,8 +64,8 @@ const theme = createTheme({
       textTransform: "none",
     },
     overline: {
-      fontWeight: 900,
-      letterSpacing: "0.08em",
+      fontWeight: 760,
+      letterSpacing: "0.06em",
     },
   },
   components: {
@@ -72,10 +73,14 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: "none",
-          border: "1px solid rgba(18,60,54,0.14)",
+          border: "1px solid rgba(17,24,22,0.12)",
           borderRadius: 4,
           boxShadow: "none",
-          backgroundColor: "#fffef8",
+          backgroundColor: "#ffffff",
+          transition: "border-color 160ms ease, background-color 160ms ease",
+          "&:hover": {
+            borderColor: "rgba(17,24,22,0.2)",
+          },
         },
       },
     },
@@ -110,7 +115,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 3,
-          fontWeight: 800,
+          fontWeight: 760,
           height: 24,
         },
       },
@@ -118,13 +123,13 @@ const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderColor: "rgba(18,60,54,0.14)",
+          borderColor: "rgba(17,24,22,0.12)",
         },
         head: {
-          color: "#53645f",
+          color: "#5f6b66",
           fontSize: 12,
-          fontWeight: 900,
-          letterSpacing: "0.05em",
+          fontWeight: 780,
+          letterSpacing: "0.04em",
           textTransform: "uppercase",
         },
       },
