@@ -1,16 +1,3 @@
-# Initial Ideas From Source Videos
-
-## Basis
-
-This is an initial synthesis of the four recordings in `sourcevids/`:
-
-- `V1-Chris Demo-20260401_160412-Meeting Recording.mp4`
-- `v2-Working Session with Chris-20260414_151003-Meeting Recording.mp4`
-- `V3-Working Session with Chris-20260414_160828-Meeting Recording.mp4`
-- `V4 - Review Chris' take on Arch-20260515_125649-Meeting Recording.mp4`
-
-The recordings are audio-only MP4s. I generated local transcripts to analyze them, so some names and tool names may have transcription noise. I normalized the company name to `Xcelforce`, the CEO to `Areg`, and the technical program manager to `Chris`.
-
 ## Executive Synthesis
 
 Areg and Chris are converging on an idea that Xcelforce can stop looking like a traditional staffing company and start positioning its people as AI-enabled resources backed by proprietary operating methods, skills, agents, and workflow automation.

@@ -15,6 +15,9 @@ Use them as reusable instruction files before starting a feature, review, or arc
 - `frontend-developer.md`  
   Owns React implementation, component structure, responsive behavior, build quality, and frontend verification.
 
+- `technical-program-manager.md`  
+  Owns product-fit review against `initial_ideas.md`, TPM operating rhythm, evidence-backed delivery visibility, demo narrative, and Chris/Areg alignment.
+
 ## Recommended Flow
 
 For a new feature:
@@ -36,6 +39,14 @@ For an architecture question:
 1. Architect analyzes options.
 2. UI/UX Designer identifies how the decision should be explained to users/buyers.
 3. Frontend Developer implements only if a UI artifact is needed.
+
+For comparing the demo against call notes:
+
+1. Technical Program Manager reads `initial_ideas.md`.
+2. Technical Program Manager audits the app against Chris/Areg's product themes.
+3. UI/UX Designer reviews any recommended experience changes.
+4. Architect reviews any security, integration, SOC 2, or IP implications.
+5. Frontend Developer implements approved demo changes.
 
 ## Ground Rules
 
