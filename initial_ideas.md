@@ -22,7 +22,7 @@ Areg is thinking primarily as CEO, seller, and operator.
 - "AI-enabled resources" may be the umbrella category.
 - TPM could be the flagship use case because the security-agent space is crowded and TPMs are not typically deeply technical.
 - Engineering managers may be an even more immediate buyer because many teams do not have TPM coverage.
-- Madri / Uber-like teams are a possible first wedge because they already feel visibility pain.
+- Madhuri / Uber-like teams are a possible first wedge because they already feel visibility pain.
 - The tool should reduce administrative overhead from standups, status chasing, and manual reporting.
 - The value is not replacing Chris; it is making Chris more scalable and making less experienced resources operate closer to Chris's level.
 - Xcelforce's real IP is the methodology: prompt sequences, prioritization logic, role-specific skills, templates, workflows, and the judgment encoded into the system.
@@ -110,7 +110,7 @@ Key ideas:
 - The product reduces administrative overhead in standups and status reporting.
 - Instead of asking engineers for status, the TPM/manager can inspect real delivery signals.
 - An engineering manager portal may be as valuable as a TPM tool because many teams do not have dedicated TPMs.
-- Areg sees Madri's team as a low-hanging pilot because she lacks visibility across leads/resources and sprint commitments.
+- Areg sees Madhuri's team as a low-hanging pilot because she lacks visibility across leads/resources and sprint commitments.
 - The same toolset could support:
   - TPMs.
   - Engineering managers.
