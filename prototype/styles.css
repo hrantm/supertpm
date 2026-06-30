@@ -302,6 +302,29 @@ h3 {
   display: block;
 }
 
+.scope-panel {
+  margin-bottom: 18px;
+}
+
+.scope-content {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.scope-content p {
+  max-width: 980px;
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.48;
+}
+
+.scope-chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -353,19 +376,27 @@ h3 {
   font-weight: 800;
 }
 
-.trend.up {
+.trend.up,
+.trend.good {
   color: var(--green);
   background: var(--green-soft);
 }
 
-.trend.flat {
+.trend.flat,
+.trend.neutral {
   color: var(--cyan);
   background: var(--cyan-soft);
 }
 
-.trend.down {
+.trend.down,
+.trend.bad {
   color: var(--red);
   background: var(--red-soft);
+}
+
+.trend.watch {
+  color: var(--amber);
+  background: var(--amber-soft);
 }
 
 .overview-grid,

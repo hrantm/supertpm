@@ -57,7 +57,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { programs, statuses, views } from "./data";
+import { roleSnapshots, statuses, views } from "./data";
 
 const drawerWidth = 260;
 
@@ -69,7 +69,7 @@ const viewIcons = {
 };
 
 const draftTabs = [
-  { id: "executive", label: "Executive", icon: FileText },
+  { id: "executive", label: "Leadership", icon: FileText },
   { id: "engineering", label: "Engineering", icon: MessageSquareText },
   { id: "jira", label: "System note", icon: ListChecks },
 ];
@@ -89,6 +89,13 @@ const sourceStateColor = {
   Simulated: "warning",
   Optional: "info",
   "Human reviewed": "primary",
+};
+
+const scopeStatusColor = {
+  "On track": "success",
+  Watch: "warning",
+  "At risk": "error",
+  Blocked: "error",
 };
 
 const toneColor = {
@@ -115,7 +122,7 @@ const insetSx = {
 };
 
 function App() {
-  const [programId, setProgramId] = useState(programs[0].id);
+  const [roleId, setRoleId] = useState(roleSnapshots[0].id);
   const [activeView, setActiveView] = useState("overview");
   const [activeDraft, setActiveDraft] = useState("executive");
   const [riskFilter, setRiskFilter] = useState("all");
@@ -123,8 +130,8 @@ function App() {
   const [toast, setToast] = useState("");
 
   const program = useMemo(
-    () => programs.find((item) => item.id === programId) ?? programs[0],
-    [programId]
+    () => roleSnapshots.find((item) => item.id === roleId) ?? roleSnapshots[0],
+    [roleId]
   );
 
   const filteredRisks = useMemo(() => {
@@ -175,13 +182,13 @@ function App() {
         <Header
           activeView={activeView}
           program={program}
-          programId={programId}
+          roleId={roleId}
           setActiveView={setActiveView}
-          setProgramId={setProgramId}
+          setRoleId={setRoleId}
           showToast={showToast}
         />
 
-        <ProgramMetaRail program={program} />
+        <RoleMetaRail program={program} />
 
         {activeView === "overview" && <Overview openEvidence={openEvidence} program={program} />}
         {activeView === "digest" && (
@@ -257,7 +264,7 @@ function Sidebar({ activeView, program, setActiveView }) {
             Xcelforce
           </Typography>
           <Typography variant="subtitle2" sx={{ lineHeight: 1.05, fontWeight: 700 }}>
-            Program Pulse
+            Org Pulse
           </Typography>
         </Box>
       </Stack>
@@ -309,7 +316,7 @@ function Sidebar({ activeView, program, setActiveView }) {
         <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
             <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.58)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em" }}>
-              Coverage
+              Visible signals
             </Typography>
             <RadioTower size={15} />
           </Stack>
@@ -343,7 +350,7 @@ function Sidebar({ activeView, program, setActiveView }) {
   );
 }
 
-function Header({ activeView, program, programId, setActiveView, setProgramId, showToast }) {
+function Header({ activeView, program, roleId, setActiveView, setRoleId, showToast }) {
   return (
     <Stack spacing={1.5} sx={{ mb: 2 }}>
       <Stack
@@ -358,38 +365,38 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
       >
         <Box sx={{ maxWidth: 820 }}>
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 1 }}>
-            <Chip size="small" label="Prototype" color="primary" variant="outlined" />
-            <Chip size="small" label="Simulated snapshot" variant="outlined" />
+            <Chip size="small" label="Role-aware prototype" color="primary" variant="outlined" />
+            <Chip size="small" label={program.scope.scopeLabel} variant="outlined" />
           </Stack>
           <Typography variant="h3" sx={{ mb: 0.75, letterSpacing: 0, fontSize: { xs: 32, md: 40 } }}>
             {program.name}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-            Prototype of read-only visibility across Jira, GitHub, Slack, Notion, meeting notes, and release signals. {program.summary}
+            Prototype of read-only visibility that changes by role, organization scope, and decision altitude. {program.summary}
           </Typography>
         </Box>
 
         <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap>
           <FormControl size="small" sx={{ minWidth: 230 }}>
             <Select
-              value={programId}
-              onChange={(event) => setProgramId(event.target.value)}
+              value={roleId}
+              onChange={(event) => setRoleId(event.target.value)}
               sx={{
                 height: 32,
                 fontSize: 13,
                 ".MuiSelect-select": { py: 0.65 },
               }}
             >
-              {programs.map((item) => (
+              {roleSnapshots.map((item) => (
                 <MenuItem key={item.id} value={item.id}>
-                  {item.name}
+                  {item.selectorLabel ?? item.name}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Tooltip title="Refresh demo snapshot">
+          <Tooltip title="Refresh role snapshot">
             <IconButton
-              onClick={() => showToast("Demo snapshot refreshed.")}
+              onClick={() => showToast("Role snapshot refreshed.")}
               sx={{ width: 32, height: 32, border: 1, borderColor: "divider" }}
             >
               <RefreshCw size={15} />
@@ -399,7 +406,7 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
             variant="contained"
             size="small"
             startIcon={<CheckCircle2 size={14} />}
-            onClick={() => showToast("Weekly brief prepared for human review.")}
+            onClick={() => showToast("Role brief prepared for human review.")}
             sx={{
               minHeight: 32,
               height: 32,
@@ -409,7 +416,7 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
               "& .MuiButton-startIcon": { mr: 0.65 },
             }}
           >
-            Prepare weekly brief
+            Prepare role brief
           </Button>
         </Stack>
       </Stack>
@@ -439,11 +446,11 @@ function Header({ activeView, program, programId, setActiveView, setProgramId, s
   );
 }
 
-function ProgramMetaRail({ program }) {
+function RoleMetaRail({ program }) {
   const items = [
-    ["Owner", program.owner],
-    ["Cadence", program.cadence],
-    ["Release target", program.releaseTarget],
+    ["Role", program.roleName],
+    ["Org scope", program.scope.organizationLabel],
+    ["Decision altitude", program.scope.decisionAltitude],
     ["Signal confidence", `${program.confidence}%`],
   ];
 
@@ -536,6 +543,8 @@ function ProgramMetaRail({ program }) {
 function Overview({ openEvidence, program }) {
   return (
     <Stack spacing={2.5}>
+      <RoleScopePanel program={program} />
+
       <WeekChanges changes={program.weekChanges} openEvidence={openEvidence} />
 
       <Box
@@ -559,13 +568,13 @@ function Overview({ openEvidence, program }) {
         }}
       >
         <Card elevation={0} sx={panelSx}>
-          <SectionHeader icon={Layers3} eyebrow="Delivery signals" title="Signal synthesis by initiative" />
+          <SectionHeader icon={Layers3} eyebrow="Role-scoped synthesis" title={program.scope.initiativeTitle} />
           <TableContainer>
             <Table sx={{ minWidth: 780 }}>
               <TableHead>
                 <TableRow>
-                  <TableCell>Initiative</TableCell>
-                  <TableCell>Lead</TableCell>
+                  <TableCell>Scope item</TableCell>
+                  <TableCell>Owner</TableCell>
                   <TableCell>Evidence strength</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Linked evidence</TableCell>
@@ -582,7 +591,7 @@ function Overview({ openEvidence, program }) {
 
         <Stack spacing={2}>
           <Card elevation={0} sx={panelSx}>
-            <SectionHeader icon={Sparkles} eyebrow="Manager readout" title="What changed" />
+            <SectionHeader icon={Sparkles} eyebrow={`${program.roleName} readout`} title="What changed" />
             <List disablePadding>
               {program.readout.map((item, index) => (
                 <Box key={item}>
@@ -625,6 +634,106 @@ function Overview({ openEvidence, program }) {
         <ConflictingSignals conflicts={program.conflicts} openEvidence={openEvidence} />
       </Box>
     </Stack>
+  );
+}
+
+function RoleScopePanel({ program }) {
+  return (
+    <Card elevation={0} sx={panelSx}>
+      <SectionHeader icon={Layers3} eyebrow={program.scope.scopeLabel} title="Role scope and visible signals" />
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.3fr) minmax(320px, 0.7fr)" },
+        }}
+      >
+        <Box
+          sx={{
+            p: 2,
+            borderRight: { lg: 1 },
+            borderBottom: { xs: 1, lg: 0 },
+            borderColor: "divider",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 860 }}>
+            {program.scope.hierarchyDescription}
+          </Typography>
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+              gap: 1,
+              mt: 1.5,
+            }}
+          >
+            {program.scopeTree.map((node, index) => (
+              <Paper key={node.label} variant="outlined" sx={{ ...insetSx, p: 1.35 }}>
+                <Stack direction="row" spacing={1.2} alignItems="flex-start" justifyContent="space-between">
+                  <Stack direction="row" spacing={1.15} alignItems="flex-start" sx={{ minWidth: 0 }}>
+                    <Avatar
+                      variant="rounded"
+                      sx={{
+                        width: 30,
+                        height: 30,
+                        bgcolor: "background.paper",
+                        border: 1,
+                        borderColor: "divider",
+                        color: "text.secondary",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </Avatar>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                        {node.label}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                        {node.owner} / {node.count}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                  <Chip
+                    size="small"
+                    label={node.status}
+                    color={scopeStatusColor[node.status] ?? "default"}
+                    variant="outlined"
+                  />
+                </Stack>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {node.summary}
+                </Typography>
+              </Paper>
+            ))}
+          </Box>
+        </Box>
+
+        <Stack spacing={1.25} sx={{ p: 2 }}>
+          <Paper variant="outlined" sx={{ ...insetSx, p: 1.35 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Decision altitude
+            </Typography>
+            <Typography variant="subtitle2" sx={{ mt: 0.35, fontWeight: 700 }}>
+              {program.scope.decisionAltitude}
+            </Typography>
+          </Paper>
+
+          <Box>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Signals visible here
+            </Typography>
+            <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
+              {program.scope.visibleSignals.map((signal) => (
+                <Chip key={signal} size="small" label={signal} variant="filled" sx={{ bgcolor: "#f0f3ef" }} />
+              ))}
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
+    </Card>
   );
 }
 
@@ -777,7 +886,7 @@ function ReviewQueue({ program }) {
 function SourceCoverage({ program }) {
   return (
     <Card elevation={0} sx={panelSx}>
-      <SectionHeader icon={RadioTower} eyebrow="Source coverage" title="Fragmented inputs" />
+      <SectionHeader icon={RadioTower} eyebrow="Visible sources" title="Signals at this role" />
       <Stack divider={<Divider />}>
         {program.signals.map((signal) => (
           <Box key={signal.source} sx={{ p: 2 }}>
@@ -837,7 +946,7 @@ function ConflictingSignals({ conflicts, openEvidence }) {
               </Paper>
               <Paper variant="outlined" sx={{ ...insetSx, p: 1.25 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  Delivery signals show
+                  Role-visible signals show
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 0.35 }}>
                   {conflict.evidence}
@@ -863,11 +972,11 @@ function ConflictingSignals({ conflicts, openEvidence }) {
                   confidence: `${conflict.priority} priority`,
                   confidenceReason: `${conflict.priority} priority because the system-of-record status and delivery evidence disagree.`,
                   current: conflict.evidence,
-                  currentLabel: "Delivery signals show",
+                  currentLabel: "Role-visible signals show",
                   eyebrow: "Conflicting signals",
                   explanation: [
                     `System-of-record says: ${conflict.system}`,
-                    `Delivery signals show: ${conflict.evidence}`,
+                    `Role-visible signals show: ${conflict.evidence}`,
                   ],
                   previous: conflict.system,
                   previousLabel: "System-of-record says",
@@ -981,7 +1090,7 @@ function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast })
         <SectionHeader
           icon={CalendarClock}
           eyebrow={program.refresh}
-          title="Weekly visibility brief"
+          title="Role visibility brief"
           action={
             <Tooltip title="Copy digest">
               <IconButton onClick={copyDigest}>
@@ -1178,7 +1287,7 @@ function Evidence({ openEvidence, program }) {
       }}
     >
       <Card elevation={0} sx={panelSx}>
-        <SectionHeader icon={GitPullRequest} eyebrow="Demo source chain" title="Example delivery signals" />
+        <SectionHeader icon={GitPullRequest} eyebrow="Role-scoped source chain" title="Example signals" />
         <Stack divider={<Divider />}>
           {program.evidence.map((event) => (
             <Box
@@ -1235,7 +1344,7 @@ function Evidence({ openEvidence, program }) {
       </Card>
 
       <Card elevation={0} sx={panelSx}>
-        <SectionHeader icon={RadioTower} eyebrow="Traceability" title="Coverage map" />
+        <SectionHeader icon={RadioTower} eyebrow="Traceability" title="Visible signal map" />
         <Stack divider={<Divider />}>
           {program.signals.map((signal) => (
             <Box key={signal.source} sx={{ p: 2 }}>

@@ -1,264 +1,221 @@
 const fixture = {
   programs: [
     {
-      id: "checkout-reliability",
-      name: "Checkout Reliability",
-      owner: "Chris L.",
-      cadence: "Weekly EM review",
-      refresh: "Mon 8:00 AM",
-      confidence: "82 percent",
+      id: "team-lead",
+      name: "Team Lead - 1 initiative",
+      role: "Team Lead",
+      orgScope: "1 initiative",
+      altitude: "Implementation direction",
+      confidence: "87 percent",
+      scopeSummary:
+        "The team lead sees one initiative. Useful signals stay close to the work: PR diffs, CI failures, runbook gaps, Jira story drift, and standup blockers.",
+      visibleSignals: ["PR diffs", "CI validation", "Jira story drift", "Runbook ownership", "Standup blockers"],
       metrics: [
-        {
-          label: "Initiatives",
-          value: "7",
-          trend: "up",
-          delta: "+2",
-          note: "2 moved from watch to on track after PR merges.",
-        },
-        {
-          label: "Open blockers",
-          value: "4",
-          trend: "down",
-          delta: "-1",
-          note: "Payments auth dependency cleared Friday.",
-        },
-        {
-          label: "Commitment risk",
-          value: "31%",
-          trend: "flat",
-          delta: "+0",
-          note: "Same risk level, but concentrated in two stories.",
-        },
-        {
-          label: "Evidence links",
-          value: "38",
-          trend: "up",
-          delta: "+9",
-          note: "PR, Jira, deploy, and CI signals in this digest.",
-        },
+        { label: "Active initiatives", value: "1", trend: "flat", delta: "+0", note: "Focused on one delivery commitment." },
+        { label: "Open code fixes", value: "6", trend: "good", delta: "-2", note: "Two review comments were resolved Friday." },
+        { label: "Validation risk", value: "42%", trend: "watch", delta: "+7", note: "Risk moved from code completion to staging proof." },
+        { label: "Reviewed signals", value: "28", trend: "neutral", delta: "+10", note: "PR, CI, runbook, Jira, and standup notes reviewed." },
       ],
       initiatives: [
-        {
-          key: "PAY-1842",
-          name: "Payment authorization cleanup",
-          lead: "Backend Platform",
-          progress: 76,
-          delta: "+18%",
-          status: "on-track",
-          summary: "Merged token refresh changes and cleared two failing integration tests.",
-        },
         {
           key: "REL-2204",
           name: "Checkout rollback automation",
           lead: "Reliability",
           progress: 48,
-          delta: "-12%",
+          delta: "-14%",
           status: "watch",
-          summary: "Rollback path is coded, but deployment verification has not started.",
-        },
-        {
-          key: "OBS-1047",
-          name: "Order trace observability",
-          lead: "Frontend Core",
-          progress: 61,
-          delta: "+9%",
-          status: "on-track",
-          summary: "Trace IDs now appear on checkout and receipt surfaces.",
-        },
-        {
-          key: "FRAUD-612",
-          name: "Risk score handoff",
-          lead: "Fraud Systems",
-          progress: 33,
-          delta: "-22%",
-          status: "at-risk",
-          summary: "API contract changed twice and PRs do not map to the committed sprint scope.",
+          summary: "Code exists, but staging rollback proof is missing.",
         },
       ],
       readout: [
-        "The team shipped meaningful reliability work, but delivery confidence is uneven across backend and fraud dependencies.",
-        "Payment auth is no longer the main blocker. Risk has shifted to rollback verification and fraud score handoff.",
-        "Two initiatives show Jira progress ahead of code evidence. The digest flags both for manager review before Thursday status.",
-        "The generated executive summary should stay green-yellow, not red. The current risk is containable if ownership is clarified by Wednesday.",
+        "The implementation direction is right, but the initiative should stay in watch until staging proof exists.",
+        "The highest leverage action is pairing Reliability and Checkout on one end-to-end validation run today.",
+        "The lead update should focus on validation and ownership, not a green status.",
       ],
       digest: [
-        {
-          title: "Completed last week",
-          items: [
-            "PAY-1842 merged PR #481 and PR #488 for token refresh cleanup.",
-            "OBS-1047 deployed trace ID propagation behind a feature flag.",
-            "REL-2204 completed rollback command scaffolding, but validation remains open.",
-          ],
-        },
-        {
-          title: "Plan for this week",
-          items: [
-            "Finish rollback verification in staging and publish operational runbook.",
-            "Resolve FRAUD-612 API contract mismatch with Fraud Systems.",
-            "Add checkout trace coverage to the Thursday readiness review.",
-          ],
-        },
-        {
-          title: "Slipped commitments",
-          items: [
-            "FRAUD-612 was forecast at 55 percent complete, but code evidence supports roughly 33 percent.",
-            "REL-2204 verification was planned for Friday and has no CI or deploy signal yet.",
-          ],
-        },
+        { title: "Completed last week", items: ["Rollback command scaffolding landed.", "Two blocking review comments were resolved.", "Initial runbook steps were drafted."] },
+        { title: "Plan for this week", items: ["Run staging rollback validation.", "Close the remaining auth guard review.", "Name the release-day rollback owner."] },
+        { title: "Slipped commitments", items: ["Staging proof was planned for Friday but has no linked evidence yet."] },
       ],
       drafts: {
-        exec: {
-          title: "Executive summary",
-          body: [
-            "Checkout Reliability remains directionally on track, with one dependency that needs management attention this week.",
-            "Payment authorization cleanup shipped as planned. Rollback automation is progressing, but validation is now the critical path. Fraud score handoff is the only initiative trending at risk due to repeated API contract changes.",
-            "Recommended action: confirm Fraud Systems ownership by Wednesday and keep rollback verification in the Thursday readiness review.",
-          ],
-        },
-        engineering: {
-          title: "Engineering team update",
-          body: [
-            "This week's priority is converting merged code into verified release confidence.",
-            "Backend Platform should close staging validation for REL-2204. Fraud Systems and Checkout need one contract decision on FRAUD-612 before additional implementation work starts.",
-            "Evidence reviewed: Jira issues PAY-1842, REL-2204, OBS-1047, FRAUD-612; PR #481, #488, #496; deploy checkout-2026.06.15.",
-          ],
-        },
-        jira: {
-          title: "Suggested Jira initiative update",
-          body: [
-            "Status: Watch.",
-            "Update: Payment auth cleanup shipped and observability work progressed. Rollback automation implementation is complete but validation is pending. Fraud handoff has slipped because API contract changes are not reflected in sprint estimates.",
-            "Risks: FRAUD-612 ownership and REL-2204 validation. Next checkpoint: Thursday readiness review.",
-          ],
-        },
+        exec: { title: "Lead summary", body: ["Checkout rollback automation is implemented but should remain in watch until staging proof is attached.", "The team needs one validation run, one review confirmation, and explicit release-day ownership before calling this ready."] },
+        engineering: { title: "Engineering update", body: ["Focus today is validation, not more implementation.", "PR #488 has the rollback path. CI does not prove staging behavior. The runbook needs an owner and a completed validation checklist."] },
+        jira: { title: "Suggested system note", body: ["Status: Watch.", "Update: Rollback implementation has landed. Staging validation and release-day owner assignment remain open."] },
       },
       risks: [
-        {
-          id: "risk-1",
-          severity: "critical",
-          status: "blocked",
-          title: "Fraud score API contract changed after sprint commitment",
-          owner: "Fraud Systems",
-          body: "The committed story still assumes v2 response fields, while PR #496 implements v3 mapping. Jira progress has not been adjusted.",
-          action: "Schedule owner decision before Wednesday noon.",
-          sources: ["FRAUD-612", "PR #496", "Slack #checkout-risk"],
-        },
-        {
-          id: "risk-2",
-          severity: "watch",
-          status: "watch",
-          title: "Rollback implementation lacks staging proof",
-          owner: "Reliability",
-          body: "Code has landed, but no CI run or deploy evidence confirms the rollback path works end to end.",
-          action: "Add staging validation to Thursday review.",
-          sources: ["REL-2204", "PR #488", "CI run 8831"],
-        },
-        {
-          id: "risk-3",
-          severity: "watch",
-          status: "watch",
-          title: "Trace coverage is good but not yet release-wide",
-          owner: "Frontend Core",
-          body: "Checkout and receipt flows are covered. Refund and retry paths are not linked to order trace IDs.",
-          action: "Confirm whether retry coverage is release-blocking.",
-          sources: ["OBS-1047", "PR #492", "Deploy 06.15"],
-        },
-        {
-          id: "risk-4",
-          severity: "critical",
-          status: "critical",
-          title: "Sprint estimate drift is concentrated in two owners",
-          owner: "Engineering Leads",
-          body: "Two stories show high activity but low closure. The signal suggests hidden work or underestimated implementation paths.",
-          action: "Rebaseline story points before next sprint planning.",
-          sources: ["PAY board", "Git activity", "Sprint 26.12"],
-        },
+        { id: "tl-risk-1", severity: "watch", status: "watch", title: "Staging rollback proof is missing", owner: "Reliability", body: "No linked signal proves the rollback path works end to end in staging.", action: "Run validation and attach evidence to REL-2204.", sources: ["REL-2204", "CI 8831", "Runbook"] },
+        { id: "tl-risk-2", severity: "critical", status: "critical", title: "Auth guard review can block readiness", owner: "Reliability", body: "One auth guard review comment remains unresolved.", action: "Get reviewer confirmation before the afternoon standup.", sources: ["PR #488", "Review thread"] },
       ],
       evidence: [
-        {
-          time: "Mon 08:00",
-          type: "Jira",
-          title: "PAY-1842 moved to Done",
-          body: "Sprint board shows payment auth cleanup complete with two linked PRs and one deploy reference.",
-          confidence: "High",
-        },
-        {
-          time: "Mon 08:04",
-          type: "GitHub",
-          title: "PR #496 conflicts with FRAUD-612 scope",
-          body: "Diff references v3 risk mapping, but Jira acceptance criteria still describe v2 response fields.",
-          confidence: "Medium",
-        },
-        {
-          time: "Mon 08:08",
-          type: "CI",
-          title: "Rollback validation missing",
-          body: "REL-2204 has merged implementation code, but no green staging validation run is linked.",
-          confidence: "High",
-        },
-        {
-          time: "Mon 08:11",
-          type: "Deploy",
-          title: "Trace IDs deployed behind feature flag",
-          body: "Checkout trace propagation is live in staging behind checkout_trace_context.",
-          confidence: "High",
-        },
+        { time: "Mon 08:00", type: "Jira", title: "REL-2204 still marked on target", body: "The story shows expected progress despite validation evidence lagging.", confidence: "Medium" },
+        { time: "Mon 08:03", type: "GitHub", title: "Rollback command path landed", body: "PR #488 includes the command path and guard checks.", confidence: "High" },
+        { time: "Mon 08:07", type: "CI", title: "CI does not exercise staging rollback", body: "CI is green for unit coverage but has no linked staging validation job.", confidence: "High" },
       ],
       signalMap: [
-        { type: "Jira", name: "Initiatives and committed scope", state: "Read only" },
-        { type: "Git", name: "PRs, diffs, owners, changed files", state: "Mocked" },
-        { type: "CI", name: "Test and validation evidence", state: "Mocked" },
-        { type: "Slack", name: "Risk comments and owner asks", state: "Optional" },
-        { type: "Output", name: "Digest, Jira update, exec summary", state: "Human reviewed" },
+        { type: "Jira", name: "Story scope and acceptance criteria", state: "Read only" },
+        { type: "Git", name: "PR diff, review state, changed files", state: "Mocked" },
+        { type: "CI", name: "Test pass and missing validation jobs", state: "Mocked" },
+        { type: "Output", name: "Lead update and system note", state: "Human reviewed" },
       ],
     },
     {
-      id: "rider-identity",
-      name: "Rider Identity Refresh",
-      owner: "Platform Identity",
-      cadence: "Thursday readiness review",
-      refresh: "Mon 8:00 AM",
-      confidence: "74 percent",
+      id: "manager",
+      name: "Manager - 4 team leads",
+      role: "Manager",
+      orgScope: "4 team leads",
+      altitude: "Dependency and priority tradeoffs",
+      confidence: "82 percent",
+      scopeSummary:
+        "The manager sees every project under four team leads. Useful signals are dependency chains, ownership gaps, sprint commitment risk, and which lead-level issue needs escalation.",
+      visibleSignals: ["Team lead drift", "Cross-project dependencies", "Ownership gaps", "Commitment risk", "Escalation candidates"],
       metrics: [
-        { label: "Initiatives", value: "5", trend: "flat", delta: "+0", note: "Stable scope for the last two weeks." },
-        { label: "Open blockers", value: "2", trend: "down", delta: "-3", note: "Legal copy and auth token issues cleared." },
-        { label: "Commitment risk", value: "24%", trend: "down", delta: "-8", note: "Risk improved after mobile SDK merge." },
-        { label: "Evidence links", value: "26", trend: "up", delta: "+4", note: "More CI evidence than last digest." },
+        { label: "Team leads", value: "4", trend: "flat", delta: "+0", note: "Four leads own the active release work." },
+        { label: "Open blockers", value: "4", trend: "good", delta: "-1", note: "Payment auth dependency cleared Friday." },
+        { label: "Commitment risk", value: "31%", trend: "watch", delta: "+0", note: "Risk is concentrated in fraud handoff and rollback validation." },
+        { label: "Cross-project links", value: "9", trend: "watch", delta: "+3", note: "Fraud and rollback now affect the same release train." },
       ],
       initiatives: [
-        { key: "ID-310", name: "Identity consent copy", lead: "Product Systems", progress: 88, delta: "+20%", status: "on-track", summary: "Legal-approved strings landed for web and iOS." },
-        { key: "ID-344", name: "Session token rotation", lead: "Identity Core", progress: 71, delta: "+14%", status: "on-track", summary: "Rotation logic merged with passing integration tests." },
-        { key: "ID-351", name: "Android SDK rollout", lead: "Mobile", progress: 42, delta: "-9%", status: "watch", summary: "SDK published, but adoption branch is still behind target." },
+        { key: "Maya Chen", name: "Checkout rollback", lead: "Team Lead", progress: 48, delta: "-14%", status: "watch", summary: "Implementation is done, but validation proof is missing." },
+        { key: "Owen Patel", name: "Fraud handoff", lead: "Team Lead", progress: 33, delta: "-22%", status: "at-risk", summary: "API contract drift is blocking release confidence." },
+        { key: "Priya Shah", name: "Order observability", lead: "Team Lead", progress: 61, delta: "+3%", status: "on-track", summary: "Trace coverage is progressing, with retry and refund gaps open." },
+        { key: "Leo Martinez", name: "Payment auth cleanup", lead: "Team Lead", progress: 76, delta: "+4%", status: "on-track", summary: "Payment cleanup shipped and no longer needs manager escalation." },
       ],
       readout: [
-        "Identity refresh is healthier than last week and no longer needs executive escalation.",
-        "Android SDK adoption should be watched because it is the only stream with code lagging Jira status.",
-        "The Thursday readout should focus on release readiness, not scope debate.",
+        "Payment auth is no longer the main blocker. Risk shifted to rollback validation and fraud handoff.",
+        "The fraud contract issue now affects rollback readiness because both feed the same release train.",
+        "The manager update should name owners and dependency decisions, not list every code fix.",
       ],
       digest: [
-        { title: "Completed last week", items: ["Consent copy landed across web and iOS.", "Session rotation tests passed.", "Legal blocker cleared."] },
-        { title: "Plan for this week", items: ["Finish Android SDK adoption.", "Run staged identity refresh rollout.", "Prepare Thursday go/no-go summary."] },
-        { title: "Slipped commitments", items: ["Android adoption branch remains one review cycle behind."] },
+        { title: "Completed last week", items: ["Payment auth cleanup shipped.", "Order trace propagation deployed behind a feature flag.", "Rollback implementation landed, but validation remains open."] },
+        { title: "Plan for this week", items: ["Resolve the fraud API contract mismatch.", "Finish rollback validation.", "Run a joint dependency review for fraud and rollback readiness."] },
+        { title: "Slipped commitments", items: ["Fraud handoff is behind committed scope.", "Rollback proof was planned for Friday and has no validation signal yet."] },
       ],
       drafts: {
-        exec: { title: "Executive summary", body: ["Rider Identity Refresh is on track with one mobile adoption watch item.", "No escalation requested this week."] },
-        engineering: { title: "Engineering team update", body: ["Keep Android SDK adoption on the critical path.", "All other streams have enough evidence for Thursday readiness."] },
-        jira: { title: "Suggested Jira initiative update", body: ["Status: On track.", "Update: Legal copy and token rotation cleared. Android adoption remains the only watch item."] },
+        exec: { title: "Manager summary", body: ["Checkout Platform remains directionally on track, with one dependency needing management attention this week.", "Recommended action: confirm Fraud Systems ownership and keep rollback validation in Thursday readiness."] },
+        engineering: { title: "Engineering update", body: ["This week's priority is converting merged code into verified release confidence.", "Fraud and Checkout need one contract decision before additional implementation work starts."] },
+        jira: { title: "Suggested system note", body: ["Status: Watch.", "Update: Payment auth shipped. Rollback validation and fraud handoff remain the active risks."] },
       },
       risks: [
-        { id: "risk-5", severity: "watch", status: "watch", title: "Android adoption branch is behind", owner: "Mobile", body: "Branch is one review cycle behind target despite Jira showing planned progress.", action: "Confirm reviewer availability today.", sources: ["ID-351", "PR #771"] },
-        { id: "risk-6", severity: "watch", status: "watch", title: "Rollout copy still needs final localization pass", owner: "Product Systems", body: "English copy is approved. Localized strings are not attached to the release checklist.", action: "Attach localization evidence before Thursday.", sources: ["ID-310", "Release checklist"] },
+        { id: "mgr-risk-1", severity: "critical", status: "blocked", title: "Fraud score API contract changed after sprint commitment", owner: "Owen Patel", body: "The committed story assumes v2 response fields, while the active PR implements v3 mapping.", action: "Schedule owner decision before Wednesday noon.", sources: ["FRAUD-612", "PR #496", "Lead sync"] },
+        { id: "mgr-risk-2", severity: "watch", status: "watch", title: "Rollback implementation lacks staging proof", owner: "Maya Chen", body: "Code landed, but no signal confirms the rollback path works end to end.", action: "Add staging validation to Thursday review.", sources: ["REL-2204", "CI 8831"] },
+        { id: "mgr-risk-3", severity: "watch", status: "watch", title: "Connected projects lack one dependency owner", owner: "Chris L.", body: "Fraud handoff and rollback validation now affect the same checkout release path.", action: "Hold a joint dependency review with both leads.", sources: ["Release plan", "Lead sync"] },
       ],
       evidence: [
-        { time: "Mon 08:00", type: "Jira", title: "ID-310 moved to Done", body: "Legal-approved consent copy is attached to the issue.", confidence: "High" },
-        { time: "Mon 08:06", type: "GitHub", title: "ID-351 branch behind target", body: "Android adoption branch has two unresolved reviews.", confidence: "Medium" },
-        { time: "Mon 08:09", type: "CI", title: "Session rotation tests green", body: "Integration suite passed on commit a82c1.", confidence: "High" },
+        { time: "Mon 08:00", type: "Jira", title: "Payment auth moved to Done", body: "Sprint board shows payment auth cleanup complete with linked PRs.", confidence: "High" },
+        { time: "Mon 08:04", type: "GitHub", title: "PR #496 conflicts with fraud scope", body: "Diff references v3 risk mapping while Jira still describes v2 fields.", confidence: "Medium" },
+        { time: "Mon 08:08", type: "CI", title: "Rollback validation missing", body: "Rollback implementation is merged, but no staging validation run is linked.", confidence: "High" },
       ],
       signalMap: [
-        { type: "Jira", name: "Release checklist and scope", state: "Read only" },
-        { type: "Git", name: "SDK branches and PRs", state: "Mocked" },
-        { type: "CI", name: "Integration tests", state: "Mocked" },
-        { type: "Output", name: "Thursday readiness summary", state: "Human reviewed" },
+        { type: "Jira", name: "Initiatives and committed scope", state: "Read only" },
+        { type: "Git", name: "PRs, owners, and changed files", state: "Mocked" },
+        { type: "Slack", name: "Risk comments and owner asks", state: "Optional" },
+        { type: "Output", name: "Manager brief and system note", state: "Human reviewed" },
+      ],
+    },
+    {
+      id: "director",
+      name: "Director - 4 managers",
+      role: "Director",
+      orgScope: "4 managers",
+      altitude: "Portfolio sequencing",
+      confidence: "76 percent",
+      scopeSummary:
+        "The director sees four manager portfolios. Useful signals are repeated dependency patterns, capacity bottlenecks, roadmap milestone drift, and which manager risks should be sequenced together.",
+      visibleSignals: ["Portfolio risk concentration", "Manager dependencies", "Capacity bottlenecks", "Roadmap drift", "Escalation patterns"],
+      metrics: [
+        { label: "Managers", value: "4", trend: "flat", delta: "+0", note: "Four manager portfolios are included." },
+        { label: "Active initiatives", value: "23", trend: "watch", delta: "+3", note: "New compliance work entered after planning." },
+        { label: "Portfolio risk", value: "38%", trend: "watch", delta: "+6", note: "Risk is concentrated in shared reviewers and commerce release dependencies." },
+        { label: "Exec asks", value: "5", trend: "watch", delta: "+2", note: "Two roadmap commitments need director-level sequencing decisions." },
+      ],
+      initiatives: [
+        { key: "Chris L.", name: "Checkout Platform", lead: "Manager", progress: 58, delta: "-8%", status: "watch", summary: "Fraud handoff and rollback validation are connected release risks." },
+        { key: "Nia Brooks", name: "Account Platform", lead: "Manager", progress: 71, delta: "+3%", status: "on-track", summary: "Identity refresh is healthy, with Android adoption as the only watch item." },
+        { key: "Samir Rao", name: "Marketplace Operations", lead: "Manager", progress: 52, delta: "-9%", status: "watch", summary: "Partner data quality is slowing catalog migration." },
+        { key: "Elena Park", name: "Trust Systems", lead: "Manager", progress: 44, delta: "-19%", status: "at-risk", summary: "Fraud controls and compliance review share scarce reviewers." },
+      ],
+      readout: [
+        "The director-level issue is reviewer scarcity across Trust, Fraud, and Commerce release work.",
+        "Checkout and Trust risks share the same fraud dependency, so escalating them separately hides the capacity problem.",
+        "Account Platform can stay out of executive escalation unless Android adoption slips again.",
+      ],
+      digest: [
+        { title: "Completed last week", items: ["Account Platform cleared legal copy and token rotation risks.", "Checkout Platform shipped payment auth cleanup.", "Marketplace completed the first partner feed quality review."] },
+        { title: "Plan for this week", items: ["Sequence fraud reviewer allocation across Checkout and Trust.", "Decide whether catalog cleanup is explicit migration scope.", "Keep identity refresh monitored at manager level."] },
+        { title: "Slipped commitments", items: ["Trust controls modernization slipped because compliance and fraud reviews share scarce reviewers.", "Catalog migration trails roadmap because partner cleanup was not in the original estimate."] },
+      ],
+      drafts: {
+        exec: { title: "Director summary", body: ["Commerce Engineering has two director-level concerns: shared fraud reviewer capacity and catalog migration cleanup scope.", "Recommended action: make reviewer allocation and catalog cleanup explicit before the next portfolio review."] },
+        engineering: { title: "Engineering update", body: ["The main portfolio constraint is reviewer capacity, not isolated team execution.", "Checkout and Trust managers should align on fraud reviewer sequencing."] },
+        jira: { title: "Suggested portfolio note", body: ["Status: Watch.", "Update: Account Platform improved; Checkout and Trust risks are connected through shared reviewer capacity."] },
+      },
+      risks: [
+        { id: "dir-risk-1", severity: "critical", status: "critical", title: "Shared fraud reviewers are overcommitted", owner: "Dana Morgan", body: "Checkout and Trust both depend on the same senior reviewers.", action: "Sequence reviewer allocation centrally this week.", sources: ["Manager notes", "Trust review queue"] },
+        { id: "dir-risk-2", severity: "watch", status: "watch", title: "Catalog migration cleanup is hidden scope", owner: "Samir Rao", body: "Partner data cleanup is consuming migration capacity but is not represented in the plan.", action: "Make cleanup scope explicit or rebaseline.", sources: ["Data quality report", "Partner notes"] },
+      ],
+      evidence: [
+        { time: "Mon 08:00", type: "Manager Brief", title: "Checkout risk tied to fraud handoff", body: "Checkout Platform names fraud and rollback as connected release risks.", confidence: "High" },
+        { time: "Mon 08:05", type: "Review Queue", title: "Trust waiting on fraud reviewers", body: "Two compliance reviews are waiting on the same senior fraud reviewers.", confidence: "High" },
+        { time: "Mon 08:09", type: "Data Quality", title: "Partner feeds below threshold", body: "Two partner feeds are below the catalog migration quality threshold.", confidence: "Medium" },
+      ],
+      signalMap: [
+        { type: "Jira", name: "Portfolio initiatives and manager status", state: "Read only" },
+        { type: "Git", name: "Review queues and ownership concentration", state: "Mocked" },
+        { type: "Notion", name: "Roadmap and partner plans", state: "Mocked" },
+        { type: "Output", name: "Director brief and sequencing asks", state: "Human reviewed" },
+      ],
+    },
+    {
+      id: "vp",
+      name: "VP - 4 directors",
+      role: "VP",
+      orgScope: "4 directors",
+      altitude: "Operating model and investment tradeoffs",
+      confidence: "72 percent",
+      scopeSummary:
+        "The VP sees four director organizations. Useful signals are commitment health, risk concentration, staffing tradeoffs, customer-impact milestones, and executive alignment gaps.",
+      visibleSignals: ["Commitment health", "Risk by director", "Staffing tradeoffs", "Customer milestones", "Executive alignment"],
+      metrics: [
+        { label: "Directors", value: "4", trend: "flat", delta: "+0", note: "Four director organizations are included." },
+        { label: "Commitments at risk", value: "8", trend: "watch", delta: "+2", note: "Risk increased in data governance and commerce sequencing." },
+        { label: "Org risk", value: "29%", trend: "watch", delta: "+4", note: "Risk is bounded but concentrated in two director organizations." },
+        { label: "Investment tradeoffs", value: "5", trend: "watch", delta: "+2", note: "Staffing and reviewer capacity decisions need VP-level alignment." },
+      ],
+      initiatives: [
+        { key: "Dana Morgan", name: "Commerce Engineering", lead: "Director", progress: 57, delta: "-9%", status: "watch", summary: "Commerce can recover if fraud reviewer allocation is sequenced this week." },
+        { key: "Riley Kim", name: "Consumer Experience", lead: "Director", progress: 69, delta: "+4%", status: "on-track", summary: "Growth and onboarding are healthy, with design review as a contained watch item." },
+        { key: "Jordan Lee", name: "Platform Foundations", lead: "Director", progress: 62, delta: "-6%", status: "watch", summary: "Infra migration is progressing but consuming more senior staff time than forecast." },
+        { key: "Morgan Fox", name: "Data and Intelligence", lead: "Director", progress: 41, delta: "-19%", status: "at-risk", summary: "Analytics modernization and governance commitments are behind plan." },
+      ],
+      readout: [
+        "The VP-level story is risk concentration: Commerce and Data account for most commitment risk this cycle.",
+        "Reviewer capacity and specialist allocation are operating-model issues, not isolated execution misses.",
+        "Consumer Experience can stay green; it does not need the same executive attention as Commerce and Data.",
+      ],
+      digest: [
+        { title: "Completed last period", items: ["Consumer Experience kept growth and onboarding milestones on track.", "Platform progressed infra migration with no new incident regression.", "Commerce identified reviewer capacity as the true blocker."] },
+        { title: "Plan for this period", items: ["Align specialist allocation across Commerce, Platform, and Data.", "Review Data governance recovery plan.", "Confirm Commerce fraud reviewer sequencing."] },
+        { title: "Slipped commitments", items: ["Data governance and analytics modernization are both behind plan.", "Commerce release confidence depends on a reviewer allocation decision."] },
+      ],
+      drafts: {
+        exec: { title: "VP operating summary", body: ["Q3 engineering commitments remain recoverable, but risk is concentrated in Commerce and Data.", "Recommended action: prioritize specialist allocation and rebaseline lower-priority commitments explicitly."] },
+        engineering: { title: "Leadership update", body: ["The next operating decision is a sequencing decision for scarce senior specialists.", "Commerce needs reviewer sequencing; Data needs governance recovery; Platform migration needs protected capacity only if it remains top priority."] },
+        jira: { title: "Suggested operating-review note", body: ["Status: Watch.", "Update: Risk is concentrated in Commerce and Data. Decision needed: specialist allocation priority for Q3 commitments."] },
+      },
+      risks: [
+        { id: "vp-risk-1", severity: "critical", status: "critical", title: "Specialist capacity is overcommitted", owner: "Avery Stone", body: "Commerce, Data, and Platform depend on scarce senior specialists in the same window.", action: "Prioritize specialist allocation in the operating review.", sources: ["Staffing forecast", "Director briefs"] },
+        { id: "vp-risk-2", severity: "critical", status: "blocked", title: "Data governance recovery plan is not credible yet", owner: "Morgan Fox", body: "Governance and analytics modernization are both behind plan.", action: "Create a recovery plan or rebaseline the governance commitment.", sources: ["Governance review", "Analytics roadmap"] },
+      ],
+      evidence: [
+        { time: "Mon 08:00", type: "Director Briefs", title: "Risk concentrated in Commerce and Data", body: "Commerce and Data account for most Q3 commitments now flagged watch or worse.", confidence: "High" },
+        { time: "Mon 08:05", type: "Staffing", title: "Senior specialist utilization above plan", body: "Fraud reviewers, governance specialists, and infra leads are all forecast above plan.", confidence: "Medium" },
+        { time: "Mon 08:09", type: "Governance", title: "Data recovery plan missing", body: "Governance and analytics modernization are behind plan without a credible recovery owner.", confidence: "High" },
+      ],
+      signalMap: [
+        { type: "Jira", name: "Commitment health across director orgs", state: "Read only" },
+        { type: "Git", name: "Review concentration and specialist ownership", state: "Mocked" },
+        { type: "Notion", name: "Roadmap, staffing, and recovery plans", state: "Mocked" },
+        { type: "Output", name: "VP operating brief and decision asks", state: "Human reviewed" },
       ],
     },
   ],
@@ -273,8 +230,8 @@ const state = {
 
 const viewTitles = {
   overview: "Overview",
-  digest: "Monday Digest",
-  risks: "Risk Review",
+  digest: "Role Brief",
+  risks: "Attention Needed",
   evidence: "Evidence",
 };
 
@@ -297,7 +254,7 @@ function getProgram() {
 function statusClass(status) {
   if (status === "on-track") return "status-on-track";
   if (status === "watch") return "status-watch";
-  if (status === "blocked") return "status-blocked";
+  if (status === "blocked" || status === "critical") return "status-blocked";
   return "status-at-risk";
 }
 
@@ -316,10 +273,19 @@ function renderProgramOptions() {
 }
 
 function renderContext(program) {
-  document.querySelector("#program-owner").textContent = program.owner;
-  document.querySelector("#program-cadence").textContent = program.cadence;
-  document.querySelector("#program-refresh").textContent = program.refresh;
+  document.querySelector("#program-owner").textContent = program.role;
+  document.querySelector("#program-cadence").textContent = program.orgScope;
+  document.querySelector("#program-refresh").textContent = program.altitude;
   document.querySelector("#program-confidence").textContent = program.confidence;
+}
+
+function renderScope(program) {
+  document.querySelector("#scope-content").innerHTML = `
+    <p>${program.scopeSummary}</p>
+    <div class="scope-chip-row">
+      ${program.visibleSignals.map((signal) => `<span class="source-chip">${signal}</span>`).join("")}
+    </div>
+  `;
 }
 
 function renderMetrics(program) {
@@ -352,10 +318,10 @@ function renderInitiatives(program) {
           </td>
           <td>${initiative.lead}</td>
           <td>
-            <div class="progress-track" aria-label="${initiative.progress} percent complete">
+            <div class="progress-track" aria-label="${initiative.progress} percent evidence">
               <div class="progress-fill" style="width: ${initiative.progress}%"></div>
             </div>
-            <span class="subtle">${initiative.progress}% complete</span>
+            <span class="subtle">${initiative.progress}% evidence</span>
           </td>
           <td>${initiative.delta}</td>
           <td><span class="status-pill ${statusClass(initiative.status)}">${statusLabels[initiative.status]}</span></td>
@@ -470,6 +436,7 @@ function renderView() {
 function renderAll() {
   const program = getProgram();
   renderContext(program);
+  renderScope(program);
   renderMetrics(program);
   renderInitiatives(program);
   renderReadout(program);
@@ -509,11 +476,11 @@ programSelect.addEventListener("change", (event) => {
 });
 
 document.querySelector("#refresh-button").addEventListener("click", () => {
-  showToast("Mock data refreshed");
+  showToast("Role snapshot refreshed");
 });
 
 document.querySelector("#approve-button").addEventListener("click", () => {
-  showToast("Digest marked ready for review");
+  showToast("Brief marked ready for review");
 });
 
 document.querySelector("#copy-digest-button").addEventListener("click", async () => {
@@ -524,7 +491,7 @@ document.querySelector("#copy-digest-button").addEventListener("click", async ()
 
   try {
     await navigator.clipboard.writeText(text);
-    showToast("Digest copied");
+    showToast("Brief copied");
   } catch {
     showToast("Copy unavailable in this browser");
   }

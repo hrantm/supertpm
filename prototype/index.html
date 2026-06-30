@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Program Pulse Prototype</title>
+    <title>Org Pulse Prototype</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
@@ -13,7 +13,7 @@
           <div class="brand-mark">PP</div>
           <div>
             <p class="eyebrow">Xcelforce</p>
-            <h1>Program Pulse</h1>
+            <h1>Org Pulse</h1>
           </div>
         </div>
 
@@ -24,11 +24,11 @@
           </button>
           <button class="nav-item" data-view="digest" type="button">
             <span class="nav-icon">02</span>
-            Monday Digest
+            Role Brief
           </button>
           <button class="nav-item" data-view="risks" type="button">
             <span class="nav-icon">03</span>
-            Risk Review
+            Attention Needed
           </button>
           <button class="nav-item" data-view="evidence" type="button">
             <span class="nav-icon">04</span>
@@ -38,36 +38,36 @@
 
         <div class="rail-status">
           <p class="eyebrow">Prototype Mode</p>
-          <strong>Fixture data only</strong>
-          <span>No live Jira, Linear, GitHub, Slack, or Teams integrations.</span>
+          <strong>Role hierarchy only</strong>
+          <span>Fixture data shows how visibility changes from team lead to VP.</span>
         </div>
       </aside>
 
       <main class="workspace">
         <header class="topbar">
           <div>
-            <p class="eyebrow">Engineering visibility layer</p>
+            <p class="eyebrow">Role-aware engineering visibility</p>
             <h2 id="view-title">Overview</h2>
           </div>
           <div class="top-actions">
-            <label class="select-label" for="program-select">Program</label>
+            <label class="select-label" for="program-select">Role</label>
             <select id="program-select" class="program-select"></select>
             <button class="ghost-button" id="refresh-button" type="button" title="Refresh mock data">Refresh</button>
-            <button class="solid-button" id="approve-button" type="button">Approve Digest</button>
+            <button class="solid-button" id="approve-button" type="button">Approve Brief</button>
           </div>
         </header>
 
-        <section class="context-strip" aria-label="Program context">
+        <section class="context-strip" aria-label="Role context">
           <div>
-            <span class="context-label">Owner</span>
+            <span class="context-label">Role</span>
             <strong id="program-owner"></strong>
           </div>
           <div>
-            <span class="context-label">Cadence</span>
+            <span class="context-label">Org scope</span>
             <strong id="program-cadence"></strong>
           </div>
           <div>
-            <span class="context-label">Last refresh</span>
+            <span class="context-label">Decision altitude</span>
             <strong id="program-refresh"></strong>
           </div>
           <div>
@@ -77,14 +77,24 @@
         </section>
 
         <section class="view active" id="overview-view" aria-labelledby="view-title">
+          <section class="panel scope-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Role scope</p>
+                <h3>Hierarchy and visible signals</h3>
+              </div>
+            </div>
+            <div class="scope-content" id="scope-content"></div>
+          </section>
+
           <div class="metric-grid" id="metric-grid"></div>
 
           <div class="overview-grid">
             <section class="panel initiative-panel">
               <div class="panel-heading">
                 <div>
-                  <p class="eyebrow">Health by initiative</p>
-                  <h3>Current delivery picture</h3>
+                  <p class="eyebrow">Role-scoped synthesis</p>
+                  <h3>Current scope picture</h3>
                 </div>
                 <div class="legend">
                   <span><i class="dot green"></i>On track</span>
@@ -96,9 +106,9 @@
                 <table>
                   <thead>
                     <tr>
-                      <th>Initiative</th>
-                      <th>Lead</th>
-                      <th>Progress</th>
+                      <th>Scope item</th>
+                      <th>Owner</th>
+                      <th>Evidence</th>
                       <th>Delta</th>
                       <th>Status</th>
                     </tr>
@@ -111,7 +121,7 @@
             <section class="panel">
               <div class="panel-heading">
                 <div>
-                  <p class="eyebrow">Manager readout</p>
+                  <p class="eyebrow">Role readout</p>
                   <h3>What changed this week</h3>
                 </div>
               </div>
@@ -126,7 +136,7 @@
               <div class="panel-heading">
                 <div>
                   <p class="eyebrow">Generated Monday 8:00 AM</p>
-                  <h3>Delivery digest</h3>
+                  <h3>Role visibility brief</h3>
                 </div>
                 <button class="ghost-button compact" id="copy-digest-button" type="button">Copy</button>
               </div>
@@ -141,7 +151,7 @@
                 </div>
               </div>
               <div class="tabs" role="tablist" aria-label="Communication audience">
-                <button class="tab active" data-audience="exec" type="button">Executive</button>
+                <button class="tab active" data-audience="exec" type="button">Leadership</button>
                 <button class="tab" data-audience="engineering" type="button">Engineering</button>
                 <button class="tab" data-audience="jira" type="button">Jira</button>
               </div>
@@ -165,7 +175,7 @@
             <section class="panel">
               <div class="panel-heading">
                 <div>
-                  <p class="eyebrow">Source-backed signals</p>
+                  <p class="eyebrow">Role-scoped signals</p>
                   <h3>Evidence timeline</h3>
                 </div>
               </div>
@@ -176,7 +186,7 @@
               <div class="panel-heading">
                 <div>
                   <p class="eyebrow">Traceability</p>
-                  <h3>Signal map</h3>
+                  <h3>Visible signal map</h3>
                 </div>
               </div>
               <div class="signal-map" id="signal-map"></div>
