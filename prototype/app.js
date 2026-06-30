@@ -221,6 +221,36 @@ const fixture = {
   ],
 };
 
+const signalColumns = [
+  { id: "jira", label: "Jira", terms: ["jira", "story", "scope", "commitment", "roadmap", "release"] },
+  { id: "git", label: "Git", terms: ["pr", "git", "review", "commit", "branch", "reviewer"] },
+  { id: "ci", label: "CI", terms: ["ci", "validation", "test", "readiness", "migration"] },
+  { id: "notes", label: "Notes", terms: ["notes", "sync", "brief", "meeting", "review", "standup"] },
+  { id: "docs", label: "Docs", terms: ["notion", "runbook", "plan", "governance", "checklist", "forecast"] },
+];
+
+const dependencyLinks = {
+  "team-lead": [
+    { source: "PR #488", target: "Staging validation", severity: "watch", summary: "Implementation exists, but release confidence waits on proof." },
+    { source: "Runbook owner", target: "Release-day support", severity: "watch", summary: "The handoff is ambiguous until one accountable owner is named." },
+  ],
+  manager: [
+    { source: "Fraud handoff", target: "Rollback readiness", severity: "critical", summary: "Contract drift changes the checkout failure path rollback must validate." },
+    { source: "Payment auth", target: "Release train", severity: "good", summary: "This dependency cleared and should leave escalation." },
+    { source: "Observability", target: "Incident debugging", severity: "watch", summary: "Retry and refund coverage still determine completeness." },
+  ],
+  director: [
+    { source: "Checkout", target: "Trust", severity: "critical", summary: "Both portfolios depend on the same senior fraud reviewers." },
+    { source: "Partner quality", target: "Catalog migration", severity: "watch", summary: "Hidden cleanup scope is consuming migration capacity." },
+    { source: "Account Platform", target: "Escalation", severity: "good", summary: "Identity refresh can stay monitored at manager level." },
+  ],
+  vp: [
+    { source: "Commerce", target: "Specialists", severity: "critical", summary: "Reviewer sequencing is needed to protect Q3 commerce milestones." },
+    { source: "Data governance", target: "Q3 commitments", severity: "critical", summary: "Governance recovery is not credible without specialist capacity." },
+    { source: "Platform", target: "Staffing tradeoff", severity: "watch", summary: "Migration is progressing, but consuming more senior staff than forecast." },
+  ],
+};
+
 const state = {
   programId: fixture.programs[0].id,
   view: "overview",
@@ -256,6 +286,38 @@ function statusClass(status) {
   if (status === "watch") return "status-watch";
   if (status === "blocked" || status === "critical") return "status-blocked";
   return "status-at-risk";
+}
+
+function clamp(value, min = 0, max = 100) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function signalScore(item, column) {
+  const text = [item.key, item.name, item.lead, item.summary].join(" ").toLowerCase();
+  const hasEvidence = column.terms.some((term) => text.includes(term));
+  const statusPenalty = item.status === "at-risk" || item.status === "critical" || item.status === "blocked" ? 28 : item.status === "watch" ? 12 : 0;
+  const evidenceBonus = hasEvidence ? 18 : column.id === "jira" ? 8 : 0;
+  return clamp(Math.round(item.progress + evidenceBonus - statusPenalty), 18, 96);
+}
+
+function heatmapTone(score) {
+  if (score >= 74) return "good";
+  if (score >= 50) return "watch";
+  return "critical";
+}
+
+function probabilityScore(probability, status) {
+  if (probability === "High" || status === "critical" || status === "blocked") return 3;
+  if (probability === "Low") return 1;
+  return 2;
+}
+
+function impactScore(risk) {
+  const text = `${risk.title} ${risk.body}`.toLowerCase();
+  if (risk.status === "blocked" || risk.status === "critical") return 3;
+  if (text.includes("q3") || text.includes("portfolio") || text.includes("roadmap") || text.includes("commitment")) return 3;
+  if (text.includes("release") || text.includes("readiness") || text.includes("operational")) return 2;
+  return 1;
 }
 
 function showToast(message) {
@@ -307,25 +369,68 @@ function renderMetrics(program) {
 
 function renderInitiatives(program) {
   document.querySelector("#initiative-table").innerHTML = program.initiatives
+    .map((initiative) => {
+      const cells = signalColumns
+        .map((column) => {
+          const score = signalScore(initiative, column);
+          const tone = heatmapTone(score);
+          return `
+            <div class="heatmap-cell ${tone}" title="${column.label}: ${score}% signal strength">
+              <strong>${score}</strong>
+              <span>${tone === "good" ? "strong" : tone === "watch" ? "watch" : "gap"}</span>
+            </div>
+          `;
+        })
+        .join("");
+
+      return `
+        <article class="heatmap-row">
+          <div class="heatmap-item">
+            <span class="signal-type">${initiative.key}</span>
+            <strong>${initiative.name}</strong>
+            <p>${initiative.summary}</p>
+            <span class="subtle">Owner: ${initiative.lead}</span>
+          </div>
+          ${cells}
+          <div class="heatmap-status">
+            <span class="status-pill ${statusClass(initiative.status)}">${statusLabels[initiative.status]}</span>
+            <span class="subtle">${initiative.delta}</span>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderDependencies(program) {
+  document.querySelector("#dependency-map").innerHTML = (dependencyLinks[program.id] || [])
     .map(
-      (initiative) => `
-        <tr>
-          <td>
-            <div class="initiative-name">
-              <strong>${initiative.name}</strong>
-              <span>${initiative.key} - ${initiative.summary}</span>
-            </div>
-          </td>
-          <td>${initiative.lead}</td>
-          <td>
-            <div class="progress-track" aria-label="${initiative.progress} percent evidence">
-              <div class="progress-fill" style="width: ${initiative.progress}%"></div>
-            </div>
-            <span class="subtle">${initiative.progress}% evidence</span>
-          </td>
-          <td>${initiative.delta}</td>
-          <td><span class="status-pill ${statusClass(initiative.status)}">${statusLabels[initiative.status]}</span></td>
-        </tr>
+      (link) => `
+        <article class="dependency-link ${link.severity}">
+          <div class="dependency-path">
+            <span>${link.source}</span>
+            <i></i>
+            <span>${link.target}</span>
+          </div>
+          <p>${link.summary}</p>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function renderHumanJudgement(program) {
+  document.querySelector("#human-judgement").innerHTML = program.risks
+    .slice(0, 3)
+    .map(
+      (risk) => `
+        <article class="judgement-item">
+          <div>
+            <h4>${risk.title}</h4>
+            <p>${risk.action}</p>
+          </div>
+          <span class="source-chip">${risk.owner}</span>
+        </article>
       `
     )
     .join("");
@@ -373,26 +478,58 @@ function renderRisks(program) {
       ? program.risks
       : program.risks.filter((risk) => risk.severity === state.riskFilter || risk.status === state.riskFilter);
 
-  document.querySelector("#risk-grid").innerHTML = risks
-    .map(
-      (risk) => `
-        <article class="risk-card">
-          <div class="risk-meta">
-            <span class="status-pill ${statusClass(risk.status)}">${statusLabels[risk.status]}</span>
-            <span class="subtle">${risk.owner}</span>
-          </div>
-          <div>
-            <h4>${risk.title}</h4>
-            <p>${risk.body}</p>
-          </div>
-          <p><strong>Suggested action:</strong> ${risk.action}</p>
-          <footer>
-            ${risk.sources.map((source) => `<span class="source-chip">${source}</span>`).join("")}
-          </footer>
-        </article>
-      `
-    )
-    .join("");
+  const probabilityRows = [
+    { score: 3, label: "High probability" },
+    { score: 2, label: "Medium probability" },
+    { score: 1, label: "Low probability" },
+  ];
+  const impactColumns = [
+    { score: 1, label: "Contained impact" },
+    { score: 2, label: "Delivery impact" },
+    { score: 3, label: "Strategic impact" },
+  ];
+
+  document.querySelector("#risk-grid").innerHTML = `
+    <div class="risk-matrix-inner">
+      <div></div>
+      ${impactColumns.map((column) => `<div class="matrix-label">${column.label}</div>`).join("")}
+      ${probabilityRows
+        .map(
+          (row) => `
+            <div class="matrix-label row-label">${row.label}</div>
+            ${impactColumns
+              .map((column) => {
+                const cellRisks = risks.filter((risk) => probabilityScore(risk.probability, risk.status) === row.score && impactScore(risk) === column.score);
+                return `
+                  <div class="matrix-cell ${row.score === 3 && column.score === 3 ? "critical-zone" : row.score + column.score >= 5 ? "watch-zone" : ""}">
+                    ${
+                      cellRisks.length === 0
+                        ? `<span class="empty-risk">No active risks</span>`
+                        : cellRisks
+                            .map(
+                              (risk) => `
+                                <article class="risk-card matrix-risk">
+                                  <div class="risk-meta">
+                                    <span class="status-pill ${statusClass(risk.status)}">${statusLabels[risk.status]}</span>
+                                    <span class="subtle">${risk.owner}</span>
+                                  </div>
+                                  <h4>${risk.title}</h4>
+                                  <p>${risk.body}</p>
+                                  <p><strong>Action:</strong> ${risk.action}</p>
+                                </article>
+                              `
+                            )
+                            .join("")
+                    }
+                  </div>
+                `;
+              })
+              .join("")}
+          `
+        )
+        .join("")}
+    </div>
+  `;
 }
 
 function renderEvidence(program) {
@@ -439,6 +576,8 @@ function renderAll() {
   renderScope(program);
   renderMetrics(program);
   renderInitiatives(program);
+  renderDependencies(program);
+  renderHumanJudgement(program);
   renderReadout(program);
   renderDigest(program);
   renderDraft(program);

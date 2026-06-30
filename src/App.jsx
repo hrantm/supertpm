@@ -23,12 +23,6 @@ import {
   Stack,
   Tab,
   Tabs,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -76,6 +70,97 @@ const draftTabs = [
 
 const riskFilters = ["all", "critical", "watch", "blocked"];
 
+const signalColumns = [
+  { id: "jira", label: "Jira", terms: ["jira", "story", "scope", "commitment", "roadmap", "release plan"] },
+  { id: "git", label: "Git", terms: ["pr", "git", "review", "commit", "branch", "reviewer"] },
+  { id: "ci", label: "CI", terms: ["ci", "validation", "test", "readiness", "migration"] },
+  { id: "notes", label: "Notes", terms: ["notes", "sync", "brief", "meeting", "review", "standup"] },
+  { id: "docs", label: "Docs", terms: ["notion", "runbook", "plan", "governance", "checklist", "forecast"] },
+];
+
+const dependencyLinksByRole = {
+  "team-lead": [
+    {
+      source: "PR #488",
+      target: "Staging validation",
+      severity: "watch",
+      summary: "Implementation exists, but release confidence waits on proof.",
+    },
+    {
+      source: "Runbook owner",
+      target: "Release-day support",
+      severity: "watch",
+      summary: "The handoff is ambiguous until one accountable owner is named.",
+    },
+  ],
+  manager: [
+    {
+      source: "Fraud handoff",
+      target: "Rollback readiness",
+      severity: "critical",
+      summary: "Contract drift changes the checkout failure path rollback must validate.",
+    },
+    {
+      source: "Payment auth cleanup",
+      target: "Release train",
+      severity: "good",
+      summary: "This dependency cleared and should be removed from escalation.",
+    },
+    {
+      source: "Order observability",
+      target: "Incident debugging",
+      severity: "watch",
+      summary: "Retry and refund coverage still determine whether the signal is complete.",
+    },
+  ],
+  director: [
+    {
+      source: "Checkout Platform",
+      target: "Trust Systems",
+      severity: "critical",
+      summary: "Both portfolios depend on the same senior fraud reviewers.",
+    },
+    {
+      source: "Partner data quality",
+      target: "Catalog migration",
+      severity: "watch",
+      summary: "Hidden cleanup scope is consuming migration capacity.",
+    },
+    {
+      source: "Account Platform",
+      target: "Director escalation",
+      severity: "good",
+      summary: "Identity refresh can stay monitored at manager level.",
+    },
+  ],
+  vp: [
+    {
+      source: "Commerce",
+      target: "Specialist allocation",
+      severity: "critical",
+      summary: "Reviewer sequencing is needed to protect Q3 commerce milestones.",
+    },
+    {
+      source: "Data governance",
+      target: "Q3 commitments",
+      severity: "critical",
+      summary: "Governance recovery is not credible without specialist capacity.",
+    },
+    {
+      source: "Platform migration",
+      target: "Staffing tradeoff",
+      severity: "watch",
+      summary: "Migration is progressing, but consuming more senior staff than forecast.",
+    },
+    {
+      source: "Consumer Experience",
+      target: "Executive escalation",
+      severity: "good",
+      summary: "Growth and onboarding remain green-yellow and do not need VP focus.",
+    },
+  ],
+};
+
 const statusColor = {
   "on-track": "success",
   watch: "warning",
@@ -104,6 +189,33 @@ const toneColor = {
   neutral: "info.main",
 };
 
+const visualTone = {
+  good: {
+    bg: "rgba(31,122,74,0.14)",
+    border: "rgba(31,122,74,0.35)",
+    color: "#155b37",
+    label: "Clear",
+  },
+  watch: {
+    bg: "rgba(183,121,31,0.16)",
+    border: "rgba(183,121,31,0.38)",
+    color: "#7b4d14",
+    label: "Watch",
+  },
+  critical: {
+    bg: "rgba(185,28,28,0.13)",
+    border: "rgba(185,28,28,0.34)",
+    color: "#8a1616",
+    label: "Critical",
+  },
+  neutral: {
+    bg: "rgba(7,89,133,0.1)",
+    border: "rgba(7,89,133,0.24)",
+    color: "#075985",
+    label: "Signal",
+  },
+};
+
 const panelSx = {
   bgcolor: "background.paper",
   borderColor: "divider",
@@ -120,6 +232,50 @@ const insetSx = {
   bgcolor: "#f5f6f3",
   borderColor: "divider",
 };
+
+function clamp(value, min = 0, max = 100) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function statusTone(status) {
+  if (status === "on-track" || status === "On track" || status === "good") return "good";
+  if (status === "at-risk" || status === "critical" || status === "blocked" || status === "At risk") return "critical";
+  return "watch";
+}
+
+function signalScore(item, column) {
+  const text = [item.key, item.name, item.lead, item.summary, ...(item.evidence ?? [])]
+    .join(" ")
+    .toLowerCase();
+  const hasEvidence = column.terms.some((term) => text.includes(term));
+  const status = statusTone(item.status);
+  const planned = item.planned ?? item.progress;
+  const drift = item.progress - planned;
+  const statusPenalty = status === "critical" ? 28 : status === "watch" ? 12 : 0;
+  const evidenceBonus = hasEvidence ? 18 : column.id === "jira" ? 8 : 0;
+
+  return clamp(Math.round(item.progress + drift * 0.4 + evidenceBonus - statusPenalty), 18, 96);
+}
+
+function signalTone(score) {
+  if (score >= 74) return "good";
+  if (score >= 50) return "watch";
+  return "critical";
+}
+
+function probabilityScore(probability) {
+  if (probability === "High") return 3;
+  if (probability === "Low") return 1;
+  return 2;
+}
+
+function impactScore(risk) {
+  const text = `${risk.impact} ${risk.title} ${risk.body}`.toLowerCase();
+  if (risk.status === "blocked" || risk.status === "critical") return 3;
+  if (text.includes("q3") || text.includes("portfolio") || text.includes("roadmap") || text.includes("commitment")) return 3;
+  if (text.includes("release") || text.includes("readiness") || text.includes("operational")) return 2;
+  return 1;
+}
 
 function App() {
   const [roleId, setRoleId] = useState(roleSnapshots[0].id);
@@ -567,59 +723,20 @@ function Overview({ openEvidence, program }) {
           alignItems: "start",
         }}
       >
-        <Card elevation={0} sx={panelSx}>
-          <SectionHeader icon={Layers3} eyebrow="Role-scoped synthesis" title={program.scope.initiativeTitle} />
-          <TableContainer>
-            <Table sx={{ minWidth: 780 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Scope item</TableCell>
-                  <TableCell>Owner</TableCell>
-                  <TableCell>Evidence strength</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Linked evidence</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {program.initiatives.map((initiative) => (
-                  <InitiativeRow key={initiative.key} initiative={initiative} />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
+        <SignalHeatmap program={program} />
+        <DependencyMap program={program} />
+      </Box>
 
-        <Stack spacing={2}>
-          <Card elevation={0} sx={panelSx}>
-            <SectionHeader icon={Sparkles} eyebrow={`${program.roleName} readout`} title="What changed" />
-            <List disablePadding>
-              {program.readout.map((item, index) => (
-                <Box key={item}>
-                  <ListItemButton disableRipple sx={{ alignItems: "flex-start", py: 2 }}>
-                    <Avatar
-                      variant="rounded"
-                      sx={{
-                        width: 34,
-                        height: 34,
-                        mr: 1.5,
-                        bgcolor: "#f0f3ef",
-                        color: "text.primary",
-                        fontSize: 12,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </Avatar>
-                    <ListItemText primary={item} primaryTypographyProps={{ variant: "body2", color: "text.secondary" }} />
-                  </ListItemButton>
-                  {index < program.readout.length - 1 && <Divider />}
-                </Box>
-              ))}
-            </List>
-          </Card>
-
-          <ReviewQueue program={program} />
-        </Stack>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1fr) minmax(0, 1fr)" },
+          gap: 2,
+          alignItems: "start",
+        }}
+      >
+        <ReadoutCard program={program} />
+        <ReviewQueue program={program} />
       </Box>
 
       <Box
@@ -662,52 +779,35 @@ function RoleScopePanel({ program }) {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
-              gap: 1,
+              gridTemplateColumns: { xs: "1fr", md: "220px minmax(0, 1fr)" },
+              gap: 1.5,
+              alignItems: "center",
               mt: 1.5,
             }}
           >
-            {program.scopeTree.map((node, index) => (
-              <Paper key={node.label} variant="outlined" sx={{ ...insetSx, p: 1.35 }}>
-                <Stack direction="row" spacing={1.2} alignItems="flex-start" justifyContent="space-between">
-                  <Stack direction="row" spacing={1.15} alignItems="flex-start" sx={{ minWidth: 0 }}>
-                    <Avatar
-                      variant="rounded"
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        bgcolor: "background.paper",
-                        border: 1,
-                        borderColor: "divider",
-                        color: "text.secondary",
-                        fontSize: 12,
-                        fontWeight: 700,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </Avatar>
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                        {node.label}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                        {node.owner} / {node.count}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                  <Chip
-                    size="small"
-                    label={node.status}
-                    color={scopeStatusColor[node.status] ?? "default"}
-                    variant="outlined"
-                  />
-                </Stack>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {node.summary}
-                </Typography>
-              </Paper>
-            ))}
+            <OrgTreeRoot program={program} />
+            <Box
+              sx={{
+                position: "relative",
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" },
+                gap: 1,
+                "&:before": {
+                  content: '""',
+                  position: "absolute",
+                  display: { xs: "none", md: "block" },
+                  left: -12,
+                  top: "14%",
+                  bottom: "14%",
+                  width: 1,
+                  bgcolor: "divider",
+                },
+              }}
+            >
+              {program.scopeTree.map((node, index) => (
+                <OrgTreeNode key={node.label} index={index} node={node} />
+              ))}
+            </Box>
           </Box>
         </Box>
 
@@ -734,6 +834,313 @@ function RoleScopePanel({ program }) {
         </Stack>
       </Box>
     </Card>
+  );
+}
+
+function OrgTreeRoot({ program }) {
+  return (
+    <Paper
+      variant="outlined"
+      sx={{
+        ...insetSx,
+        position: "relative",
+        p: 1.35,
+        borderLeft: 4,
+        borderLeftColor: "primary.main",
+        "&:after": {
+          content: '""',
+          position: "absolute",
+          display: { xs: "none", md: "block" },
+          right: -13,
+          top: "50%",
+          width: 12,
+          height: 1,
+          bgcolor: "divider",
+        },
+      }}
+    >
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        Current viewpoint
+      </Typography>
+      <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.35 }}>
+        {program.roleName}
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.35 }}>
+        {program.scope.organizationLabel}
+      </Typography>
+    </Paper>
+  );
+}
+
+function OrgTreeNode({ index, node }) {
+  const tone = statusTone(node.status);
+  const visual = visualTone[tone];
+
+  return (
+    <Paper
+      variant="outlined"
+      sx={{
+        position: "relative",
+        p: 1.35,
+        bgcolor: visual.bg,
+        borderColor: visual.border,
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          display: { xs: "none", md: "block" },
+          left: -13,
+          top: "50%",
+          width: 12,
+          height: 1,
+          bgcolor: "divider",
+        },
+      }}
+    >
+      <Stack direction="row" spacing={1.15} alignItems="flex-start" justifyContent="space-between">
+        <Stack direction="row" spacing={1.05} alignItems="flex-start" sx={{ minWidth: 0 }}>
+          <Avatar
+            variant="rounded"
+            sx={{
+              width: 30,
+              height: 30,
+              bgcolor: "background.paper",
+              border: 1,
+              borderColor: visual.border,
+              color: visual.color,
+              fontSize: 12,
+              fontWeight: 800,
+              flexShrink: 0,
+            }}
+          >
+            {String(index + 1).padStart(2, "0")}
+          </Avatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+              {node.label}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+              {node.owner} / {node.count}
+            </Typography>
+          </Box>
+        </Stack>
+        <Chip size="small" label={node.status} color={scopeStatusColor[node.status] ?? "default"} variant="outlined" />
+      </Stack>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        {node.summary}
+      </Typography>
+    </Paper>
+  );
+}
+
+function SignalHeatmap({ program }) {
+  return (
+    <Card elevation={0} sx={panelSx}>
+      <SectionHeader icon={Layers3} eyebrow="Signal heatmap" title={program.scope.initiativeTitle} />
+      <Box sx={{ p: 1.5, overflowX: "auto" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "220px repeat(5, 82px) 96px",
+              md: "minmax(260px, 1.4fr) repeat(5, minmax(72px, 0.45fr)) 104px",
+            },
+            minWidth: 760,
+            border: 1,
+            borderColor: "divider",
+            bgcolor: "divider",
+            gap: "1px",
+          }}
+        >
+          <HeatmapHeader label="Scope item" />
+          {signalColumns.map((column) => (
+            <HeatmapHeader key={column.id} label={column.label} align="center" />
+          ))}
+          <HeatmapHeader label="Status" align="center" />
+
+          {program.initiatives.map((initiative) => (
+            <SignalHeatmapRow initiative={initiative} key={initiative.key} />
+          ))}
+        </Box>
+      </Box>
+      <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ px: 1.5, pb: 1.5 }}>
+        {[
+          ["Strong signal", "good"],
+          ["Needs review", "watch"],
+          ["Evidence gap", "critical"],
+        ].map(([label, tone]) => (
+          <Chip
+            key={label}
+            size="small"
+            label={label}
+            variant="outlined"
+            sx={{
+              bgcolor: visualTone[tone].bg,
+              borderColor: visualTone[tone].border,
+              color: visualTone[tone].color,
+            }}
+          />
+        ))}
+      </Stack>
+    </Card>
+  );
+}
+
+function HeatmapHeader({ align = "left", label }) {
+  return (
+    <Box sx={{ bgcolor: "#fafbf9", px: 1, py: 0.95, textAlign: align }}>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        {label}
+      </Typography>
+    </Box>
+  );
+}
+
+function SignalHeatmapRow({ initiative }) {
+  const drift = initiative.progress - (initiative.planned ?? initiative.progress);
+
+  return (
+    <>
+      <Box sx={{ bgcolor: "background.paper", p: 1.2, minWidth: 0 }}>
+        <Typography variant="caption" color="primary" sx={{ fontWeight: 800 }}>
+          {initiative.key}
+        </Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+          {initiative.name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.35 }}>
+          {initiative.summary}
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.65, fontWeight: 700 }}>
+          Owner: {initiative.lead}
+        </Typography>
+      </Box>
+
+      {signalColumns.map((column) => {
+        const score = signalScore(initiative, column);
+        const tone = signalTone(score);
+        const visual = visualTone[tone];
+
+        return (
+          <Tooltip
+            key={column.id}
+            title={`${column.label}: ${score}% signal strength. ${
+              tone === "good" ? "Enough corroborating evidence." : tone === "watch" ? "Needs human review." : "Evidence gap."
+            }`}
+          >
+            <Box
+              sx={{
+                display: "grid",
+                placeItems: "center",
+                minHeight: 74,
+                bgcolor: visual.bg,
+                border: 1,
+                borderColor: visual.border,
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ color: visual.color, fontWeight: 900, lineHeight: 1 }}>
+                {score}
+              </Typography>
+              <Typography variant="caption" sx={{ color: visual.color, fontWeight: 700, mt: -1.2 }}>
+                {tone === "good" ? "strong" : tone === "watch" ? "watch" : "gap"}
+              </Typography>
+            </Box>
+          </Tooltip>
+        );
+      })}
+
+      <Box sx={{ display: "grid", placeItems: "center", bgcolor: "background.paper", p: 1 }}>
+        <Chip size="small" label={statuses[initiative.status]} color={statusColor[initiative.status]} variant="outlined" />
+        <Typography variant="caption" color={drift >= 0 ? "success.main" : "error.main"} sx={{ mt: 0.75, fontWeight: 800 }}>
+          {drift >= 0 ? "+" : ""}
+          {drift}%
+        </Typography>
+      </Box>
+    </>
+  );
+}
+
+function DependencyMap({ program }) {
+  const links = dependencyLinksByRole[program.id] ?? [];
+
+  return (
+    <Card elevation={0} sx={panelSx}>
+      <SectionHeader icon={GitBranch} eyebrow="Dependency map" title="Connected work" />
+      <Stack spacing={1.1} sx={{ p: 1.5 }}>
+        {links.map((link) => {
+          const visual = visualTone[link.severity] ?? visualTone.watch;
+
+          return (
+            <Paper
+              key={`${link.source}-${link.target}`}
+              variant="outlined"
+              sx={{
+                p: 1.25,
+                bgcolor: visual.bg,
+                borderColor: visual.border,
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.9 }}>
+                <DependencyNode label={link.source} tone={link.severity} />
+                <Box
+                  sx={{
+                    position: "relative",
+                    flex: 1,
+                    height: 2,
+                    bgcolor: visual.border,
+                    "&:after": {
+                      content: '""',
+                      position: "absolute",
+                      right: -1,
+                      top: -4,
+                      width: 0,
+                      height: 0,
+                      borderTop: "5px solid transparent",
+                      borderBottom: "5px solid transparent",
+                      borderLeft: `7px solid ${visual.border}`,
+                    },
+                  }}
+                />
+                <DependencyNode label={link.target} tone={link.severity} />
+              </Stack>
+              <Typography variant="body2" color="text.secondary">
+                {link.summary}
+              </Typography>
+            </Paper>
+          );
+        })}
+      </Stack>
+    </Card>
+  );
+}
+
+function DependencyNode({ label, tone }) {
+  const visual = visualTone[tone] ?? visualTone.watch;
+
+  return (
+    <Box
+      sx={{
+        px: 1,
+        py: 0.55,
+        maxWidth: 140,
+        border: 1,
+        borderColor: visual.border,
+        bgcolor: "background.paper",
+      }}
+    >
+      <Typography
+        variant="caption"
+        sx={{
+          display: "block",
+          color: visual.color,
+          fontWeight: 800,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {label}
+      </Typography>
+    </Box>
   );
 }
 
@@ -854,6 +1261,38 @@ function WeekChanges({ changes, openEvidence }) {
           </Box>
         ))}
       </Box>
+    </Card>
+  );
+}
+
+function ReadoutCard({ program }) {
+  return (
+    <Card elevation={0} sx={panelSx}>
+      <SectionHeader icon={Sparkles} eyebrow={`${program.roleName} readout`} title="What changed" />
+      <List disablePadding>
+        {program.readout.map((item, index) => (
+          <Box key={item}>
+            <ListItemButton disableRipple sx={{ alignItems: "flex-start", py: 2 }}>
+              <Avatar
+                variant="rounded"
+                sx={{
+                  width: 34,
+                  height: 34,
+                  mr: 1.5,
+                  bgcolor: "#f0f3ef",
+                  color: "text.primary",
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </Avatar>
+              <ListItemText primary={item} primaryTypographyProps={{ variant: "body2", color: "text.secondary" }} />
+            </ListItemButton>
+            {index < program.readout.length - 1 && <Divider />}
+          </Box>
+        ))}
+      </List>
     </Card>
   );
 }
@@ -1026,54 +1465,6 @@ function MetricCard({ metric }) {
   );
 }
 
-function InitiativeRow({ initiative }) {
-  const drift = initiative.progress - initiative.planned;
-
-  return (
-    <TableRow hover sx={{ "&:last-child td": { borderBottom: 0 } }}>
-      <TableCell sx={{ width: "34%" }}>
-        <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>
-          {initiative.key}
-        </Typography>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-          {initiative.name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {initiative.summary}
-        </Typography>
-      </TableCell>
-      <TableCell>{initiative.lead}</TableCell>
-      <TableCell sx={{ minWidth: 170 }}>
-        <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.75 }}>
-          <Typography variant="caption" color="text.secondary">
-            {initiative.progress}% evidence
-          </Typography>
-          <Typography variant="caption" color={drift >= 0 ? "success.main" : "error.main"} sx={{ fontWeight: 600 }}>
-            {drift >= 0 ? "+" : ""}
-            {drift}% vs expected
-          </Typography>
-        </Stack>
-        <LinearProgress variant="determinate" value={initiative.progress} sx={{ height: 5, borderRadius: 0 }} />
-      </TableCell>
-      <TableCell>
-        <Chip
-          size="small"
-          label={statuses[initiative.status]}
-          color={statusColor[initiative.status]}
-          variant="outlined"
-        />
-      </TableCell>
-      <TableCell>
-        <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
-          {initiative.evidence.map((source) => (
-            <Chip key={source} size="small" label={source} variant="filled" sx={{ bgcolor: "#f0f3ef" }} />
-          ))}
-        </Stack>
-      </TableCell>
-    </TableRow>
-  );
-}
-
 function Digest({ activeDraft, copyDigest, program, setActiveDraft, showToast }) {
   const draft = program.drafts[activeDraft];
 
@@ -1185,81 +1576,169 @@ function Risks({ filteredRisks, openEvidence, riskFilter, setRiskFilter }) {
         ))}
       </Stack>
 
+      <RiskMatrix risks={filteredRisks} openEvidence={openEvidence} />
+    </Stack>
+  );
+}
+
+function RiskMatrix({ openEvidence, risks }) {
+  const probabilityRows = [
+    { score: 3, label: "High probability" },
+    { score: 2, label: "Medium probability" },
+    { score: 1, label: "Low probability" },
+  ];
+  const impactColumns = [
+    { score: 1, label: "Contained impact" },
+    { score: 2, label: "Delivery impact" },
+    { score: 3, label: "Strategic impact" },
+  ];
+
+  return (
+    <Card elevation={0} sx={panelSx}>
+      <SectionHeader icon={AlertTriangle} eyebrow="Priority matrix" title="Risk by impact and probability" />
+      <Box sx={{ p: 1.5, overflowX: "auto" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "154px repeat(3, minmax(250px, 1fr))",
+            minWidth: 920,
+            gap: 1,
+          }}
+        >
+          <Box />
+          {impactColumns.map((column) => (
+            <Paper key={column.score} variant="outlined" sx={{ ...insetSx, p: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                {column.label}
+              </Typography>
+            </Paper>
+          ))}
+
+          {probabilityRows.map((row) => (
+            <RiskMatrixRow
+              impactColumns={impactColumns}
+              key={row.score}
+              openEvidence={openEvidence}
+              probability={row}
+              risks={risks}
+            />
+          ))}
+        </Box>
+      </Box>
+    </Card>
+  );
+}
+
+function RiskMatrixRow({ impactColumns, openEvidence, probability, risks }) {
+  return (
+    <>
+      <Paper
+        variant="outlined"
+        sx={{
+          ...insetSx,
+          display: "grid",
+          alignContent: "center",
+          p: 1,
+          minHeight: 186,
+        }}
+      >
+        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          {probability.label}
+        </Typography>
+      </Paper>
+      {impactColumns.map((impact) => {
+        const cellRisks = risks.filter(
+          (risk) => probabilityScore(risk.probability) === probability.score && impactScore(risk) === impact.score
+        );
+
+        return (
+          <Paper
+            key={`${probability.score}-${impact.score}`}
+            variant="outlined"
+            sx={{
+              display: "grid",
+              gap: 1,
+              alignContent: "start",
+              minHeight: 186,
+              p: 1,
+              bgcolor:
+                probability.score === 3 && impact.score === 3
+                  ? "rgba(185,28,28,0.08)"
+                  : probability.score + impact.score >= 5
+                    ? "rgba(183,121,31,0.1)"
+                    : "background.paper",
+              borderColor: probability.score === 3 && impact.score === 3 ? "rgba(185,28,28,0.22)" : "divider",
+            }}
+          >
+            {cellRisks.length === 0 ? (
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                No active risks
+              </Typography>
+            ) : (
+              cellRisks.map((risk) => <RiskMatrixCard key={risk.id} openEvidence={openEvidence} risk={risk} />)
+            )}
+          </Paper>
+        );
+      })}
+    </>
+  );
+}
+
+function RiskMatrixCard({ openEvidence, risk }) {
+  return (
+    <Paper variant="outlined" sx={{ p: 1.15, bgcolor: "background.paper", borderLeft: 3, borderLeftColor: `${statusColor[risk.status]}.main` }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+        <Chip size="small" label={statuses[risk.status]} color={statusColor[risk.status]} variant="outlined" />
+        <AlertTriangle size={16} color="#b91c1c" />
+      </Stack>
+      <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 1 }}>
+        {risk.title}
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+        {risk.body}
+      </Typography>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", xl: "repeat(3, 1fr)" },
-          gap: 2,
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: 0.75,
+          mt: 1,
         }}
       >
-        {filteredRisks.map((risk) => (
-          <Card key={risk.id} elevation={0} sx={panelSx}>
-            <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-                <Chip size="small" label={statuses[risk.status]} color={statusColor[risk.status]} variant="outlined" />
-                <AlertTriangle size={18} color="#e5484d" />
-              </Stack>
-              <Typography variant="h6" sx={{ fontSize: 17, mb: 1 }}>
-                {risk.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {risk.body}
-              </Typography>
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: 1,
-                  mb: 2,
-                }}
-              >
-                <RiskStat label="Owner" value={risk.owner} />
-                <RiskStat label="Probability" value={risk.probability} />
-                <RiskStat label="Impact" value={risk.impact} />
-              </Box>
-
-              <Alert severity="success" icon={<CheckCircle2 size={16} />} sx={{ mb: 2, bgcolor: "rgba(31,122,74,0.1)", color: "text.primary", borderRadius: 1 }}>
-                {risk.action}
-              </Alert>
-
-              <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
-                {risk.sources.map((source) => (
-                  <Chip key={source} size="small" label={source} variant="filled" sx={{ bgcolor: "#f0f3ef" }} />
-                ))}
-              </Stack>
-              <Button
-                fullWidth
-                size="small"
-                variant="outlined"
-                startIcon={<FileSearch size={15} />}
-                onClick={() =>
-                  openEvidence({
-                    action: risk.action,
-                    confidence: `${risk.probability} probability`,
-                    confidenceReason: `${risk.probability} probability based on ${risk.sources.length} linked signals and ${risk.impact.toLowerCase()} impact.`,
-                    current: risk.body,
-                    currentLabel: "Risk signal",
-                    eyebrow: "Risk explanation",
-                    explanation: [
-                      risk.body,
-                      `Impact area: ${risk.impact}.`,
-                      `Human owner to confirm: ${risk.owner}.`,
-                    ],
-                    sources: risk.sources,
-                    summary: risk.body,
-                    title: risk.title,
-                  })
-                }
-                sx={{ mt: 1.5 }}
-              >
-                Explain evidence
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+        <RiskStat label="Owner" value={risk.owner} />
+        <RiskStat label="Impact" value={risk.impact} />
       </Box>
-    </Stack>
+      <Alert severity="success" icon={<CheckCircle2 size={16} />} sx={{ mt: 1, bgcolor: "rgba(31,122,74,0.1)", color: "text.primary", borderRadius: 1 }}>
+        {risk.action}
+      </Alert>
+      <Button
+        fullWidth
+        size="small"
+        variant="outlined"
+        startIcon={<FileSearch size={15} />}
+        onClick={() =>
+          openEvidence({
+            action: risk.action,
+            confidence: `${risk.probability} probability`,
+            confidenceReason: `${risk.probability} probability based on ${risk.sources.length} linked signals and ${risk.impact.toLowerCase()} impact.`,
+            current: risk.body,
+            currentLabel: "Risk signal",
+            eyebrow: "Risk explanation",
+            explanation: [
+              risk.body,
+              `Impact area: ${risk.impact}.`,
+              `Human owner to confirm: ${risk.owner}.`,
+            ],
+            sources: risk.sources,
+            summary: risk.body,
+            title: risk.title,
+          })
+        }
+        sx={{ mt: 1 }}
+      >
+        Explain evidence
+      </Button>
+    </Paper>
   );
 }
 

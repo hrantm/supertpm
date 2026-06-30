@@ -93,31 +93,30 @@
             <section class="panel initiative-panel">
               <div class="panel-heading">
                 <div>
-                  <p class="eyebrow">Role-scoped synthesis</p>
+                  <p class="eyebrow">Signal heatmap</p>
                   <h3>Current scope picture</h3>
                 </div>
                 <div class="legend">
-                  <span><i class="dot green"></i>On track</span>
-                  <span><i class="dot amber"></i>Watch</span>
-                  <span><i class="dot red"></i>At risk</span>
+                  <span><i class="dot green"></i>Strong</span>
+                  <span><i class="dot amber"></i>Review</span>
+                  <span><i class="dot red"></i>Gap</span>
                 </div>
               </div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Scope item</th>
-                      <th>Owner</th>
-                      <th>Evidence</th>
-                      <th>Delta</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="initiative-table"></tbody>
-                </table>
-              </div>
+              <div class="heatmap-wrap" id="initiative-table"></div>
             </section>
 
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Dependency map</p>
+                  <h3>Connected work</h3>
+                </div>
+              </div>
+              <div id="dependency-map" class="dependency-map"></div>
+            </section>
+          </div>
+
+          <div class="insight-grid">
             <section class="panel">
               <div class="panel-heading">
                 <div>
@@ -126,6 +125,16 @@
                 </div>
               </div>
               <div id="manager-readout" class="readout-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Human judgment</p>
+                  <h3>Needs follow-up</h3>
+                </div>
+              </div>
+              <div id="human-judgement" class="judgement-list"></div>
             </section>
           </div>
         </section>
@@ -167,7 +176,7 @@
             <button class="filter-pill" data-filter="watch" type="button">Watch</button>
             <button class="filter-pill" data-filter="blocked" type="button">Blocked</button>
           </div>
-          <div class="risk-grid" id="risk-grid"></div>
+          <div class="risk-matrix" id="risk-grid"></div>
         </section>
 
         <section class="view" id="evidence-view" aria-labelledby="view-title">
